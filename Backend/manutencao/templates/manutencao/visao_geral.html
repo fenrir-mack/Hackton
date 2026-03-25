@@ -8,67 +8,95 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #08090b; color: #dde2ea; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+  body { background: #f8fafc; color: #1e293b; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
 
+  /* Topbar */
   #topbar {
     position: sticky; top: 0; z-index: 200;
-    background: #0d0f13; border-bottom: 1px solid #1c2030;
-    display: flex; align-items: center; padding: 0 24px; height: 54px;
+    background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; padding: 0 24px; height: 56px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
   .logo { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
-  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; }
-  .logo-text { font-weight: 800; font-size: 15px; }
-  .logo-sub  { font-size: 9px; color: #4b5675; letter-spacing: 2px; }
-  .tabs { display: flex; gap: 2px; flex: 1; }
-  .tab-btn { background: none; border: none; cursor: pointer; color: #5a657a; font-size: 13px; font-weight: 500; padding: 6px 18px; border-radius: 7px; text-decoration: none; display: inline-block; }
-  .tab-btn:hover  { color: #9ba8be; background: #13161c; }
-  .tab-btn.active { color: #f59e0b; background: #1a1d26; border: 1px solid #252b3a; font-weight: 700; }
-  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4b5675; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; }
+  .logo-text { font-weight: 800; font-size: 15px; color: #0f172a; }
+  .logo-sub  { font-size: 9px; color: #64748b; letter-spacing: 2px; }
 
-  #alert-bar { background: #160606; border-bottom: 1px solid #5c1a1a; padding: 7px 24px; font-size: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  #alert-bar .lbl { color: #f87171; }
-  #alert-bar .nms { color: #ef4444; font-weight: 700; }
+  .tabs { display: flex; gap: 4px; flex: 1; list-style: none; }
+  .tab-link {
+    text-decoration: none; color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 7px; transition: 0.2s;
+  }
+  .tab-link:hover { color: #0f172a; background: #f1f5f9; }
+  .tab-link.active { color: #f59e0b; background: #fffbeb; border: 1px solid #fef3c7; font-weight: 700; }
 
-  .tl-legend { display: flex; align-items: center; gap: 20px; padding: 7px 24px; background: #0d0f13; border-bottom: 1px solid #1c2030; font-size: 11px; color: #4b5675; flex-wrap: wrap; }
-  .tl-item { display: flex; align-items: center; gap: 6px; }
-  .tl-line { width: 28px; height: 2px; }
+  /* Controls Above Search */
+  .sidebar-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .toggle-container { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; color: #64748b; cursor: pointer; }
+  .toggle-switch { position: relative; width: 34px; height: 18px; background: #e2e8f0; border-radius: 20px; transition: 0.3s; }
+  .toggle-switch::after { content: ''; position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
+  #show-hidden:checked + .toggle-switch { background: #3b82f6; }
+  #show-hidden:checked + .toggle-switch::after { left: 18px; }
+  #show-hidden { display: none; }
+
+  /* Alert Bar */
+  #alert-bar { background: #fef2f2; border-bottom: 1px solid #fee2e2; padding: 10px 24px; font-size: 12px; color: #991b1b; display: flex; align-items: center; gap: 8px; }
+  #alert-bar .nms { font-weight: 700; color: #dc2626; }
 
   .panel { padding: 24px; }
-  .sec-title { font-size: 10px; color: #4b5675; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  .sec-title { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; }
 
-  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-  .card  { background: #0d0f13; border: 1px solid #1c2030; border-radius: 12px; padding: 18px; }
+  /* Layout */
+  #ov-layout { display: grid; grid-template-columns: 350px 1fr; gap: 24px; }
 
-  .prio-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 10px; border: 1px solid #1c2030; background: #0d0f13; cursor: pointer; margin-bottom: 8px; }
-  .prio-row:hover, .prio-row.sel { border-color: var(--tc); background: #12151c; }
-  .prio-rank { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--tc); color: var(--tc); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; background: var(--tbg); }
-  .prio-info { flex: 1; min-width: 0; }
-  .prio-name { font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px; margin-bottom: 3px; flex-wrap: wrap; }
-  .prio-sub  { font-size: 11px; color: #4b5675; }
-  .prio-bar-bg { height: 3px; background: #1c2030; border-radius: 2px; margin-top: 8px; }
-  .prio-bar    { height: 100%; border-radius: 2px; background: var(--tc); }
-  .prio-dates  { text-align: right; flex-shrink: 0; min-width: 100px; }
-  .prio-dlabel { font-size: 9px; color: #4b5675; letter-spacing: 1px; }
-  .prio-dval   { font-size: 12px; font-weight: 700; font-family: monospace; }
+  /* Sidebar */
+  .sidebar-container { display: flex; flex-direction: column; gap: 12px; }
+  .search-box {
+    width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;
+    background: #fff; font-size: 13px; outline: none; transition: 0.2s;
+  }
+  .search-box:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
 
-  .badge { font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 2px 7px; border-radius: 4px; border: 1px solid; font-family: monospace; white-space: nowrap; }
+  /* Card Esquerda */
+  .prio-row {
+    display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px;
+    border: 1px solid #e2e8f0; background: #ffffff; cursor: pointer; margin-bottom: 10px; transition: 0.2s;
+    position: relative;
+  }
+  .prio-row:hover { border-color: #cbd5e1; background: #f8fafc; }
+  .prio-row.selected { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08); background: #fff; }
+  .prio-row.is-hidden { opacity: 0.5; background: #f1f5f9; border-style: dashed; }
 
-  .chart-box { background: #0d0f13; border: 1px solid #1c2030; border-radius: 12px; padding: 18px; }
+  .prio-header { display: flex; justify-content: space-between; align-items: center; padding-right: 25px; }
+  .prio-name { font-weight: 700; font-size: 14px; color: #1e293b; }
 
-  .milestone-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-  .milestone { flex: 1; min-width: 110px; border-radius: 8px; padding: 10px 14px; border-left: 3px solid; }
-  .ms-label  { font-size: 9px; letter-spacing: 1px; color: #4b5675; margin-bottom: 3px; }
-  .ms-date   { font-size: 15px; font-weight: 800; font-family: monospace; }
-  .ms-desc   { font-size: 11px; color: #4b5675; margin-top: 2px; }
+  .hide-btn {
+    position: absolute; right: 12px; top: 18px; background: none; border: none;
+    color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px; border-radius: 4px; transition: 0.2s;
+  }
+  .hide-btn:hover { color: #3b82f6; background: #eff6ff; }
 
-  .kpi { text-align: center; padding: 16px; }
-  .kpi-val { font-size: 36px; font-weight: 900; font-family: monospace; }
-  .kpi-lbl { font-size: 10px; color: #4b5675; margin-top: 3px; letter-spacing: 1px; }
+  .badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 5px; border: 1px solid; text-transform: uppercase; }
+  .prio-details { display: flex; justify-content: space-between; font-size: 11px; color: #64748b; }
+  .maint-date { font-weight: 600; color: #475569; }
 
-  #ov-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+  /* Paginação e Outros */
+  .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 10px; padding: 10px 0; }
+  .pg-btn { border: 1px solid #e2e8f0; background: #fff; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; color: #64748b; }
+  .pg-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+  .chart-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .milestone-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .milestone { flex: 1; min-width: 140px; border-radius: 10px; padding: 12px; border: 1px solid #e2e8f0; background: #f8fafc; }
+  .ms-label { font-size: 9px; color: #94a3b8; font-weight: 700; }
+  .ms-date { font-size: 16px; font-weight: 800; margin: 2px 0; }
+  .ms-desc { font-size: 11px; color: #64748b; }
+
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+  .card-kpi { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; }
+  .kpi-val { font-size: 28px; font-weight: 900; }
+  .kpi-lbl { font-size: 10px; color: #94a3b8; font-weight: 700; margin-top: 4px; }
+
   @media(max-width:1100px) { #ov-layout { grid-template-columns: 1fr; } }
-  @media(max-width:900px)  { .grid3 { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -78,46 +106,48 @@
     <div class="logo-icon">⚡</div>
     <div><div class="logo-text">VibSense</div><div class="logo-sub">PREDICTIVE MAINTENANCE</div></div>
   </div>
-   <div class="tabs">
-      <li><a href="{% url 'manutencao:visao_geral' %}">Visão Geral</a></li>
-      <li><a href="{% url 'manutencao:graficos' %}">Graficos</a></li>
-      <li><a href="{% url 'manutencao:kanban' %}">Kanban</a></li>
-      <li><a href="{% url 'manutencao:relatorio' %}" class="active">Relatorios</a></li>
-  </div>
-  <div class="live-dot"><div class="dot"></div><span>Dados até 20/01/2026</span></div>
+  <ul class="tabs">
+      <li><a href="#" class="tab-link active">Visão Geral</a></li>
+      <li><a href="#" class="tab-link">Gráficos</a></li>
+      <li><a href="#" class="tab-link">Kanban</a></li>
+      <li><a href="#" class="tab-link">Relatórios</a></li>
+  </ul>
+  <div style="font-size: 12px; color: #16a34a; font-weight: 600;">● Sistema Online</div>
 </div>
 
 <div id="alert-bar">
   <span>⚠</span>
-  <span class="lbl">Compra de peças recomendada para 20/04/2026 —</span>
-  <span class="nms">Compressor Alpha · Ventilador CV-07 (vibração acima de 60% do limite)</span>
-</div>
-
-<div class="tl-legend">
-  <div class="tl-item"><div class="tl-line" style="background:#3b82f6;height:2px"></div><span>Vibração real (medida)</span></div>
-  <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #4b5675"></div><span>Projeção</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#f59e0b;height:2px"></div><span>20/01/2026 — Corte dos dados</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#a855f7;height:2px"></div><span>20/04/2026 — Comprar peças</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#ef4444;height:2px"></div><span>08/08/2026 — Manutenção</span></div>
+  <span>Compra de peças recomendada para <span class="nms">20/04/2026</span> — Compressor Alpha · Ventilador CV-07</span>
 </div>
 
 <div class="panel">
   <div id="ov-layout">
-    <div>
-      <div class="sec-title">Prioridade de Manutenção</div>
+    <div class="sidebar-container">
+      <div class="sidebar-controls">
+        <div class="sec-title" style="margin-bottom:0">Ativos Industriais</div>
+        <label class="toggle-container">
+          <span>Ver Ocultos</span>
+          <input type="checkbox" id="show-hidden" onchange="renderList()">
+          <div class="toggle-switch"></div>
+        </label>
+      </div>
+
+      <input type="text" id="machine-search" class="search-box" placeholder="Pesquisar máquina ou setor...">
       <div id="prio-list"></div>
+      <div class="pagination" id="pagination"></div>
     </div>
+
     <div>
-      <div class="sec-title">Curva de Vibração com Previsão</div>
-      <div class="chart-box" style="margin-bottom:16px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div class="sec-title">Análise de Tendência</div>
+      <div class="chart-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
           <div>
-            <div id="det-name" style="font-weight:800;font-size:16px"></div>
-            <div id="det-sub" style="font-size:11px;color:#4b5675;margin-top:2px"></div>
+            <div id="det-name" style="font-weight:800;font-size:18px;color:#0f172a"></div>
+            <div id="det-sub" style="font-size:12px;color:#64748b"></div>
           </div>
           <span id="det-badge" class="badge"></span>
         </div>
-        <canvas id="det-chart" height="200"></canvas>
+        <canvas id="det-chart" height="180"></canvas>
         <div class="milestone-row" id="det-milestones"></div>
       </div>
       <div class="grid3" id="det-kpis"></div>
@@ -126,179 +156,140 @@
 </div>
 
 <script>
-const LABELS = [
-  "Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25",
-  "Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26","Ago/26"
-];
-
-const IDX_CUTOFF = 6;
-const DATE_CUTOFF = "20/01/2026";
-const DATE_BUY = "20/04/2026";
-const DATE_MAINT = "08/08/2026";
-
-function splitData(all) {
-  return {
-    real: all.map((v,i) => i <= IDX_CUTOFF ? v : null),
-    proj: all.map((v,i) => i >= IDX_CUTOFF ? v : null),
-  };
-}
-
 const MACHINES = [
-  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", growth:"+62%",
-    allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s" },
-  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", growth:"+55%",
-    allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s" },
-  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", growth:"+41%",
-    allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s" },
-  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", growth:"+18%",
-    allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s" },
-  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", growth:"+15%",
-    allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s" },
-  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", growth:"+2%",
-    allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s" },
+  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", nextMaint:"08/08/2026", growth:"+62%", allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s", hidden: false },
+  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", nextMaint:"12/08/2026", growth:"+55%", allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s", hidden: false },
+  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", nextMaint:"15/09/2026", growth:"+41%", allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s", hidden: false },
+  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", nextMaint:"10/11/2026", growth:"+18%", allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s", hidden: false },
+  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", nextMaint:"22/11/2026", growth:"+15%", allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s", hidden: false },
+  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", nextMaint:"05/01/2027", growth:"+2%", allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s", hidden: false },
 ];
 
 const TREND = {
-  critical:{ label:"CRÍTICO", color:"#ef4444", bg:"#450a0a", text:"#fca5a5" },
-  warning: { label:"ALERTA", color:"#f59e0b", bg:"#431407", text:"#fcd34d" },
-  watch:   { label:"OBSERVAR", color:"#3b82f6", bg:"#0c1a3a", text:"#93c5fd" },
-  stable:  { label:"ESTÁVEL", color:"#22c55e", bg:"#052e16", text:"#86efac" },
+  critical:{ label:"CRÍTICO", color:"#dc2626", bg:"#fef2f2", text:"#991b1b" },
+  warning: { label:"ALERTA", color:"#d97706", bg:"#fffbeb", text:"#92400e" },
+  watch:   { label:"OBSERVAR", color:"#2563eb", bg:"#eff6ff", text:"#1e40af" },
+  stable:  { label:"ESTÁVEL", color:"#16a34a", bg:"#f0fdf4", text:"#166534" },
 };
 
+let currentPage = 1;
+const itemsPerPage = 10;
 let detChart = null;
+let currentSelectedId = "M-01";
 
-function badge(trend) {
-  const t = TREND[trend];
-  return `<span class="badge" style="color:${t.text};border-color:${t.color};background:${t.bg}">${t.label}</span>`;
+function toggleHideMachine(e, id) {
+  e.stopPropagation();
+  const m = MACHINES.find(x => x.id === id);
+  if (m) {
+    m.hidden = !m.hidden;
+    renderList();
+  }
 }
 
-function annotations() {
-  return {
-    cutoff: { type:'line', scaleID:'x', value:"Jan/26", borderColor:'#f59e0b', borderWidth:2, borderDash:[5,4],
-      label:{ display:true, content:'20/01 — dados reais', backgroundColor:'#f59e0b18', color:'#f59e0b', font:{size:9,weight:'bold'}, position:'start', yAdjust:-6 }
-    },
-    buy: { type:'line', scaleID:'x', value:"Abr/26", borderColor:'#a855f7', borderWidth:2, borderDash:[5,4],
-      label:{ display:true, content:'20/04 — comprar peças', backgroundColor:'#a855f718', color:'#a855f7', font:{size:9,weight:'bold'}, position:'start', yAdjust:-6 }
-    },
-    maint: { type:'line', scaleID:'x', value:"Ago/26", borderColor:'#ef4444', borderWidth:2, borderDash:[5,4],
-      label:{ display:true, content:'08/08 — manutenção', backgroundColor:'#ef444418', color:'#ef4444', font:{size:9,weight:'bold'}, position:'start', yAdjust:-6 }
-    },
-  };
-}
+function renderList() {
+  const list = document.getElementById('prio-list');
+  const showHidden = document.getElementById('show-hidden').checked;
+  const searchTerm = document.getElementById('machine-search').value.toLowerCase();
 
-function makeDatasets(m) {
-  const t = TREND[m.trend];
-  const { real, proj } = splitData(m.allVib);
-  return [
-    { label:'Vibração real', data:real, borderColor:t.color, backgroundColor:t.color+'22', borderWidth:2.5, pointRadius:3, fill:true, tension:.35, spanGaps:false },
-    { label:'Projeção', data:proj, borderColor:'#64748b', backgroundColor:'transparent', borderWidth:1.8, borderDash:[6,4], pointRadius:2, fill:false, tension:.35, spanGaps:false },
-    { label:`Limite (${m.limit} ${m.unit})`, data:LABELS.map(()=>m.limit), borderColor:'#ef444466', backgroundColor:'transparent', borderWidth:1.5, borderDash:[3,3], pointRadius:0, fill:false },
-  ];
-}
+  list.innerHTML = '';
 
-function chartConfig(m) {
-  return {
-    type:'line',
-    data:{ labels:LABELS, datasets:makeDatasets(m) },
-    options:{
-      responsive:true, animation:false,
-      plugins:{
-        legend:{ labels:{ color:'#4b5675', font:{size:10}, boxWidth:14, padding:12 } },
-        tooltip:{ backgroundColor:'#0d0f13', borderColor:'#1c2030', borderWidth:1, titleColor:'#4b5675', bodyColor:'#dde2ea' },
-        annotation:{ annotations:annotations() }
-      },
-      scales:{
-        x:{ ticks:{ color:'#4b5675', font:{size:9} }, grid:{ color:'#1c2030' } },
-        y:{ ticks:{ color:'#4b5675', font:{size:9} }, grid:{ color:'#1c2030' }, suggestedMin:0, suggestedMax:m.limit*1.35,
-            title:{ display:true, text:m.unit, color:'#4b5675', font:{size:9} } }
-      }
-    }
-  };
-}
+  // Filtragem baseada em busca, ocultos e toggle
+  const displayItems = MACHINES.filter(m => {
+    const matchesSearch = m.name.toLowerCase().includes(searchTerm) || m.sector.toLowerCase().includes(searchTerm);
+    const shouldShowBasedOnHidden = showHidden ? true : !m.hidden;
+    return matchesSearch && shouldShowBasedOnHidden;
+  });
 
-function buildPrioList() {
-  const el = document.getElementById('prio-list');
-  MACHINES.forEach((m,i) => {
+  const start = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = displayItems.slice(start, start + itemsPerPage);
+
+  paginatedItems.forEach((m) => {
     const t = TREND[m.trend];
-    const cur = m.allVib[IDX_CUTOFF];
-    const pct = Math.max(4, Math.min(100, (cur/m.limit)*100));
     const row = document.createElement('div');
-    row.className = 'prio-row';
-    row.id = 'prio-'+m.id;
-    row.style.setProperty('--tc', t.color);
-    row.style.setProperty('--tbg', t.bg);
+    row.className = `prio-row ${m.id === currentSelectedId ? 'selected' : ''} ${m.hidden ? 'is-hidden' : ''}`;
+
     row.innerHTML = `
-      <div class="prio-rank">#${i+1}</div>
-      <div class="prio-info">
-        <div class="prio-name">${m.name} ${badge(m.trend)}</div>
-        <div class="prio-sub">${m.id} · ${m.sector}</div>
-        <div class="prio-bar-bg"><div class="prio-bar" style="width:${pct.toFixed(0)}%"></div></div>
+      <button class="hide-btn" onclick="toggleHideMachine(event, '${m.id}')" title="${m.hidden ? 'Reexibir' : 'Ocultar'}">
+        ${m.hidden ? '👁️‍🗨️' : '👁'}
+      </button>
+      <div class="prio-header">
+        <div class="prio-name">${m.name}</div>
+        <span class="badge" style="background:${t.bg}; color:${t.text}; border-color:${t.color}">${t.label}</span>
       </div>
-      <div class="prio-dates">
-        <div class="prio-dlabel">COMPRAR PEÇAS</div>
-        <div class="prio-dval" style="color:#a855f7">${DATE_BUY}</div>
-        <div class="prio-dlabel" style="margin-top:5px">MANUTENÇÃO</div>
-        <div class="prio-dval" style="color:#ef4444">${DATE_MAINT}</div>
-      </div>`;
+      <div class="prio-details">
+        <span>Setor: ${m.sector}</span>
+        <span class="maint-date">📅 ${m.nextMaint}</span>
+      </div>
+    `;
     row.onclick = () => selectMachine(m.id);
-    el.appendChild(row);
+    list.appendChild(row);
+  });
+
+  renderPagination(displayItems.length);
+}
+
+function renderPagination(totalCount) {
+  const pag = document.getElementById('pagination');
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  pag.innerHTML = '';
+  if (totalPages <= 1) return;
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.className = `pg-btn ${i === currentPage ? 'active' : ''}`;
+    btn.textContent = i;
+    btn.onclick = () => { currentPage = i; renderList(); };
+    pag.appendChild(btn);
+  }
+}
+
+document.getElementById('machine-search').oninput = () => {
+  currentPage = 1;
+  renderList();
+};
+
+function selectMachine(id) {
+  currentSelectedId = id;
+  renderList();
+
+  const m = MACHINES.find(x => x.id === id);
+  const t = TREND[m.trend];
+  const cur = m.allVib[6];
+
+  document.getElementById('det-name').textContent = m.name;
+  document.getElementById('det-sub').textContent = `${m.id} • ${m.sector} • Tendência ${m.growth}`;
+
+  const b = document.getElementById('det-badge');
+  b.textContent = t.label; b.style.color = t.text; b.style.background = t.bg; b.style.borderColor = t.color;
+
+  document.getElementById('det-kpis').innerHTML = `
+    <div class="card-kpi"><div class="kpi-val" style="color:${t.color}">${cur.toFixed(2)}</div><div class="kpi-lbl">${m.unit.toUpperCase()} ATUAL</div></div>
+    <div class="card-kpi"><div class="kpi-val" style="color:#1e293b">${((cur/m.limit)*100).toFixed(0)}%</div><div class="kpi-lbl">DO LIMITE</div></div>
+    <div class="card-kpi"><div class="kpi-val" style="color:#d97706">${m.growth}</div><div class="kpi-lbl">TENDÊNCIA 6M</div></div>
+  `;
+
+  document.getElementById('det-milestones').innerHTML = `
+    <div class="milestone"> <div class="ms-label">COMPRAR PEÇAS</div> <div class="ms-date" style="color:#7c3aed">20/04/26</div> <div class="ms-desc">Aprovação pendente</div> </div>
+    <div class="milestone"> <div class="ms-label">MANUTENÇÃO</div> <div class="ms-date" style="color:#dc2626">${m.nextMaint}</div> <div class="ms-desc">Parada prevista</div> </div>
+  `;
+
+  if (detChart) detChart.destroy();
+  const ctx = document.getElementById('det-chart').getContext('2d');
+  detChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ["Jul","Ago","Set","Out","Nov","Dez","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago"],
+      datasets: [
+        { label: 'Real', data: m.allVib.map((v,i)=> i<=6?v:null), borderColor: t.color, tension: 0.3, fill: true, backgroundColor: t.color+'10' },
+        { label: 'Previsão', data: m.allVib.map((v,i)=> i>=6?v:null), borderColor: '#94a3b8', borderDash: [5,5], tension: 0.3 }
+      ]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
   });
 }
 
-function selectMachine(id) {
-  document.querySelectorAll('.prio-row').forEach(r=>r.classList.remove('sel'));
-  const row = document.getElementById('prio-'+id);
-  if (row) row.classList.add('sel');
-
-  const m = MACHINES.find(x=>x.id===id);
-  const t = TREND[m.trend];
-  const cur = m.allVib[IDX_CUTOFF];
-  const pct = ((cur/m.limit)*100).toFixed(0);
-
-  document.getElementById('det-name').textContent = m.name;
-  document.getElementById('det-sub').textContent = `${m.id} · ${m.sector} · Tendência ${m.growth} nos últimos 6 meses`;
-  const badgeEl = document.getElementById('det-badge');
-  badgeEl.textContent = t.label;
-  badgeEl.style.color = t.text;
-  badgeEl.style.borderColor = t.color;
-  badgeEl.style.background = t.bg;
-
-  document.getElementById('det-milestones').innerHTML = `
-    <div class="milestone" style="border-color:#f59e0b;background:#f59e0b08">
-      <div class="ms-label">CORTE DADOS</div>
-      <div class="ms-date" style="color:#f59e0b">${DATE_CUTOFF}</div>
-      <div class="ms-desc">Última medição real</div>
-    </div>
-    <div class="milestone" style="border-color:#a855f7;background:#a855f708">
-      <div class="ms-label">COMPRAR PEÇAS</div>
-      <div class="ms-date" style="color:#a855f7">${DATE_BUY}</div>
-      <div class="ms-desc">Lead-time estimado</div>
-    </div>
-    <div class="milestone" style="border-color:#ef4444;background:#ef444408">
-      <div class="ms-label">MANUTENÇÃO</div>
-      <div class="ms-date" style="color:#ef4444">${DATE_MAINT}</div>
-      <div class="ms-desc">Parada programada</div>
-    </div>`;
-
-  document.getElementById('det-kpis').innerHTML = `
-    <div class="card kpi">
-      <div class="kpi-val" style="color:${t.color}">${cur.toFixed(2)}</div>
-      <div class="kpi-lbl">VIBRAÇÃO ATUAL (${m.unit})</div>
-    </div>
-    <div class="card kpi">
-      <div class="kpi-val" style="color:#ef4444">${pct}%</div>
-      <div class="kpi-lbl">DO LIMITE</div>
-    </div>
-    <div class="card kpi">
-      <div class="kpi-val" style="color:#a855f7">${m.growth}</div>
-      <div class="kpi-lbl">TENDÊNCIA 6M</div>
-    </div>`;
-
-  if (detChart) detChart.destroy();
-  detChart = new Chart(document.getElementById('det-chart'), chartConfig(m));
-}
-
-buildPrioList();
+// Iniciar
+renderList();
 selectMachine(MACHINES[0].id);
 </script>
 </body>
