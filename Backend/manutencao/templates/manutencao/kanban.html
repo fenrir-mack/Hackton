@@ -3,64 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VibSense – Kanban</title>
+<title>VibSense – Kanban (Light)</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0d0f13; color: #dde2ea; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+  body {
+    background: #f8fafc;
+    color: #1e293b;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
 
-  /* Topbar */
+  /* Topbar - Versão Clara */
   #topbar {
     position: sticky; top: 0; z-index: 200;
-    background: #0d0f13; border-bottom: 1px solid #1c2030;
-    display: flex; align-items: center; padding: 0 24px; height: 54px;
+    background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; padding: 0 24px; height: 56px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
   .logo { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
-  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; }
-  .logo-text { font-weight: 800; font-size: 15px; }
-  .logo-sub  { font-size: 9px; color: #4b5675; letter-spacing: 2px; }
+  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; }
+  .logo-text { font-weight: 800; font-size: 15px; color: #0f172a; }
+  .logo-sub  { font-size: 9px; color: #64748b; letter-spacing: 2px; }
 
-  /* Tabs corrigidas para navegação real */
-  .tabs { display: flex; gap: 5px; flex: 1; list-style: none; }
-  .tabs li { display: inline-block; }
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; flex: 1; list-style: none; }
   .tab-link {
     text-decoration: none;
-    color: #5a657a; font-size: 13px; font-weight: 500; padding: 8px 16px;
+    color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px;
     border-radius: 7px; transition: 0.2s; border: 1px solid transparent;
-    display: block;
   }
-  .tab-link:hover { color: #9ba8be; background: #13161c; }
-  .tab-link.active { color: #f59e0b; background: #1a1d26; border: 1px solid #252b3a; font-weight: 700; }
+  .tab-link:hover { color: #0f172a; background: #f1f5f9; }
+  .tab-link.active { color: #f59e0b; background: #fffbeb; border: 1px solid #fef3c7; font-weight: 700; }
 
-  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4b5675; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
 
-  /* Legend */
-  .tl-legend { display: flex; align-items: center; gap: 20px; padding: 12px 24px; background: #08090b; border-bottom: 1px solid #1c2030; font-size: 11px; color: #4b5675; flex-wrap: wrap; }
+  /* Legenda */
+  .tl-legend { display: flex; align-items: center; gap: 20px; padding: 12px 24px; background: #ffffff; border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #64748b; flex-wrap: wrap; }
   .tl-item { display: flex; align-items: center; gap: 6px; }
-  .tl-line { width: 28px; height: 2px; }
+  .tl-line { width: 28px; height: 2px; border-radius: 2px; }
 
   .panel { padding: 24px; }
-  .sec-title { font-size: 10px; color: #4b5675; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+  .sec-title { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; font-weight: 700; }
 
-  /* Kanban Board */
-  .kb-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: start; }
-  .kb-col { background: #13161c; border: 1px solid #1c2030; border-radius: 12px; min-height: 500px; display: flex; flex-direction: column; }
-  .kb-col.drag-over { background: #1a1d26; border-color: #f59e0b; }
-  .kb-col-header { padding: 16px; font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1c2030; }
-  .kb-count { background: #08090b; color: #4b5675; border-radius: 10px; padding: 2px 8px; font-size: 11px; }
-  .kb-cards-container { padding: 12px; flex-grow: 1; min-height: 100px; }
+  /* Kanban Board - Versão Clara */
+  .kb-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: start; }
 
-  .kb-card { background: #08090b; border: 1px solid #1c2030; border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: grab; transition: 0.2s; }
-  .kb-card:hover { border-color: #3b82f6; }
-  .kb-card.dragging { opacity: 0.4; }
+  .kb-col {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+  }
+  .kb-col.drag-over { background: #e2e8f0; border-color: #cbd5e1; }
 
-  .kb-machine { font-size: 10px; color: #4b5675; margin-bottom: 6px; font-family: monospace; }
-  .kb-task { font-size: 13px; color: #dde2ea; font-weight: 600; margin-bottom: 12px; }
-  .kb-meta { display: flex; justify-content: space-between; font-size: 11px; padding-top: 8px; border-top: 1px solid #1c2030; }
-  .kb-due { color: #f59e0b; }
+  .kb-col-header {
+    padding: 16px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .kb-count { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 11px; }
 
-  @media(max-width:1000px) { .kb-board { grid-template-columns: repeat(2, 1fr); } }
-  @media(max-width:600px) { .kb-board { grid-template-columns: 1fr; } }
+  .kb-cards-container { padding: 10px; flex-grow: 1; min-height: 100px; }
+
+  /* Cards Brancos */
+  .kb-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: grab;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+  .kb-card:hover { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .kb-card.dragging { opacity: 0.5; transform: scale(0.98); }
+
+  .kb-machine { font-size: 10px; color: #94a3b8; margin-bottom: 6px; font-family: monospace; font-weight: 700; text-transform: uppercase; }
+  .kb-task { font-size: 13px; color: #334155; font-weight: 600; margin-bottom: 14px; line-height: 1.4; }
+
+  .kb-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+  }
+  .kb-who { color: #64748b; }
+  .kb-due { color: #d97706; font-weight: 700; }
+
+  @media(max-width:1100px) { .kb-board { grid-template-columns: repeat(2, 1fr); } }
+  @media(max-width:650px) { .kb-board { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -78,28 +118,27 @@
       <li><a href="{% url 'manutencao:relatorio' %}" class="tab-link">Relatórios</a></li>
   </ul>
 
-  <div class="live-dot"><div class="dot"></div><span>Dados até 20/01/2026</span></div>
+  <div class="live-dot"><div class="dot"></div><span>Sistema Online</span></div>
 </div>
 
 <div class="tl-legend">
   <div class="tl-item"><div class="tl-line" style="background:#3b82f6;"></div><span>Vibração real</span></div>
-  <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #4b5675"></div><span>Projeção</span></div>
+  <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #94a3b8"></div><span>Projeção</span></div>
   <div class="tl-item"><div class="tl-line" style="background:#f59e0b;"></div><span>Corte: 20/01/26</span></div>
 </div>
 
 <div class="panel">
-  <div class="sec-title">Gestão de Manutenção / Kanban</div>
+  <div class="sec-title">Gestão de Manutenção / Kanban Interativo</div>
   <div class="kb-board" id="kb-board">
     </div>
 </div>
 
 <script>
-// Dados do Kanban
 const COLUMNS = {
-  urgente:      { label:"Urgente",      color:"#ef4444", icon:"🔴" },
-  em_andamento: { label:"Em Andamento", color:"#f59e0b", icon:"🟡" },
-  agendado:      { label:"Agendado",      color:"#3b82f6", icon:"🔵" },
-  concluido:    { label:"Concluído",    color:"#22c55e", icon:"✅" },
+  urgente:      { label:"Urgente",      color:"#dc2626", icon:"🔴" },
+  em_andamento: { label:"Em Andamento", color:"#d97706", icon:"🟡" },
+  agendado:      { label:"Agendado",      color:"#2563eb", icon:"🔵" },
+  concluido:    { label:"Concluído",    color:"#16a34a", icon:"✅" },
 };
 
 let KB_DATA = {
@@ -146,7 +185,7 @@ function renderBoard() {
         <div class="kb-machine">${card.machine}</div>
         <div class="kb-task">${card.task}</div>
         <div class="kb-meta">
-          <span class="kb-who">${card.who}</span>
+          <span class="kb-who">👤 ${card.who}</span>
           <span class="kb-due">${card.due}</span>
         </div>
       `;
@@ -160,7 +199,6 @@ function renderBoard() {
       container.appendChild(cardEl);
     });
 
-    // Eventos de Drop
     colEl.addEventListener('dragover', e => {
       e.preventDefault();
       colEl.classList.add('drag-over');
