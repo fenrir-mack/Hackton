@@ -8,7 +8,7 @@ def graficos_view(request):
     return render(request, 'manutencao/graficos.html')
 
 def visao_geral_view(request):
-    return render(request, "manutencao/vicao_geral.html")
+    return render(request, "manutencao/visao_geral.html")
 
 def kanban_view(request):
     return render(request, 'manutencao/kanban.html')

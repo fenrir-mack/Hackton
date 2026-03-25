@@ -1,29 +1,217 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Kanban</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibSense – Relatório</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #08090b; color: #dde2ea; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+
+  #topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: #0d0f13; border-bottom: 1px solid #1c2030;
+    display: flex; align-items: center; padding: 0 24px; height: 54px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
+  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .logo-text { font-weight: 800; font-size: 15px; }
+  .logo-sub  { font-size: 9px; color: #4b5675; letter-spacing: 2px; }
+  .tabs { display: flex; gap: 2px; flex: 1; }
+  .tab-btn { background: none; border: none; cursor: pointer; color: #5a657a; font-size: 13px; font-weight: 500; padding: 6px 18px; border-radius: 7px; text-decoration: none; display: inline-block; }
+  .tab-btn:hover  { color: #9ba8be; background: #13161c; }
+  .tab-btn.active { color: #f59e0b; background: #1a1d26; border: 1px solid #252b3a; font-weight: 700; }
+  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4b5675; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+
+  #alert-bar { background: #160606; border-bottom: 1px solid #5c1a1a; padding: 7px 24px; font-size: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  #alert-bar .lbl { color: #f87171; }
+  #alert-bar .nms { color: #ef4444; font-weight: 700; }
+
+  .tl-legend { display: flex; align-items: center; gap: 20px; padding: 7px 24px; background: #0d0f13; border-bottom: 1px solid #1c2030; font-size: 11px; color: #4b5675; flex-wrap: wrap; }
+  .tl-item { display: flex; align-items: center; gap: 6px; }
+  .tl-line { width: 28px; height: 2px; }
+
+  .panel { padding: 24px; }
+  .sec-title { font-size: 10px; color: #4b5675; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+
+  .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+  .card  { background: #0d0f13; border: 1px solid #1c2030; border-radius: 12px; padding: 18px; }
+
+  .kpi { text-align: center; padding: 16px; }
+  .kpi-val { font-size: 28px; font-weight: 900; font-family: monospace; }
+  .kpi-lbl { font-size: 10px; color: #4b5675; margin-top: 3px; letter-spacing: 1px; }
+
+  .badge { font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 2px 7px; border-radius: 4px; border: 1px solid; font-family: monospace; white-space: nowrap; }
+
+  .report-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .report-table th { text-align: left; color: #4b5675; font-size: 10px; letter-spacing: 1px; padding: 8px 12px; border-bottom: 1px solid #1c2030; }
+  .report-table td { padding: 10px 12px; border-bottom: 1px solid #1c2030; vertical-align: middle; }
+  .report-table tr:hover td { background: #12151c; }
+
+  .steep-item { padding: 10px 0; border-bottom: 1px solid #1c2030; }
+  .steep-item:last-child { border-bottom: none; }
+
+  @media(max-width:900px) { .grid4 { grid-template-columns: repeat(2,1fr); } }
+</style>
 </head>
 <body>
-    <h1>Kanban</h1>
 
-    <div style="display:flex; gap:20px;">
-        <div>
-            <h3>A Fazer</h3>
-            <p>Tarefa 1</p>
-        </div>
+<div id="topbar">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div><div class="logo-text">VibSense</div><div class="logo-sub">PREDICTIVE MAINTENANCE</div></div>
+  </div>
+  <div class="tabs">
+      <li><a href="{% url 'manutencao:visao_geral' %}">Visão Geral</a></li>
+      <li><a href="{% url 'manutencao:graficos' %}">Graficos</a></li>
+      <li><a href="{% url 'manutencao:kanban' %}">Kanban</a></li>
+      <li><a href="{% url 'manutencao:relatorio' %}" class="active">Relatorios</a></li>
+  </div>
+  <div class="live-dot"><div class="dot"></div><span>Dados até 20/01/2026</span></div>
+</div>
 
-        <div>
-            <h3>Fazendo</h3>
-            <p>Tarefa 2</p>
-        </div>
 
-        <div>
-            <h3>Concluído</h3>
-            <p>Tarefa 3</p>
-        </div>
+<div class="tl-legend">
+  <div class="tl-item"><div class="tl-line" style="background:#3b82f6;height:2px"></div><span>Vibração real (medida)</span></div>
+  <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #4b5675"></div><span>Projeção</span></div>
+  <div class="tl-item"><div class="tl-line" style="background:#f59e0b;height:2px"></div><span>20/01/2026 — Corte dos dados</span></div>
+  <div class="tl-item"><div class="tl-line" style="background:#a855f7;height:2px"></div><span>20/04/2026 — Comprar peças</span></div>
+  <div class="tl-item"><div class="tl-line" style="background:#ef4444;height:2px"></div><span>08/08/2026 — Manutenção</span></div>
+</div>
+
+<div class="panel">
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px">
+      <div>
+        <div style="font-size:10px;color:#4b5675;letter-spacing:3px;margin-bottom:6px">RELATÓRIO DE CONDIÇÃO DE MAQUINÁRIOS</div>
+        <div style="font-size:24px;font-weight:900;color:#f59e0b">VIBRO REPORT</div>
+        <div style="font-size:11px;color:#4b5675;margin-top:4px" id="rep-date"></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:#4b5675">Status Geral</div>
+        <div style="font-size:30px;font-weight:900;color:#ef4444">CRÍTICO</div>
+        <div style="font-size:10px;color:#4b5675">2 máquina(s) acima de 60% do limite</div>
+      </div>
     </div>
+  </div>
 
-    <a href="/relatorio">Ir para Relatório</a>
+  <div class="grid4" style="margin-bottom:16px" id="rep-kpis"></div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="sec-title">Cronograma de Ações — Ordenado por Urgência</div>
+    <div style="overflow-x:auto">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Equipamento</th><th>Setor</th>
+            <th>Vibração (20/01)</th><th>% do Limite</th>
+            <th>Comprar Peças</th><th>Manutenção</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="rep-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:#f97316">
+    <div class="sec-title" style="color:#f97316">Curva Crescendo Acentuadamente</div>
+    <div id="rep-steep"></div>
+  </div>
+</div>
+
+<script>
+const IDX_CUTOFF = 6;
+const DATE_BUY = "20/04/2026";
+const DATE_MAINT = "08/08/2026";
+
+const MACHINES = [
+  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", growth:"+62%",
+    allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s" },
+  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", growth:"+55%",
+    allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s" },
+  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", growth:"+41%",
+    allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s" },
+  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", growth:"+18%",
+    allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s" },
+  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", growth:"+15%",
+    allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s" },
+  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", growth:"+2%",
+    allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s" },
+];
+
+const TREND = {
+  critical:{ label:"CRÍTICO", color:"#ef4444", bg:"#450a0a", text:"#fca5a5" },
+  warning: { label:"ALERTA", color:"#f59e0b", bg:"#431407", text:"#fcd34d" },
+  watch:   { label:"OBSERVAR", color:"#3b82f6", bg:"#0c1a3a", text:"#93c5fd" },
+  stable:  { label:"ESTÁVEL", color:"#22c55e", bg:"#052e16", text:"#86efac" },
+};
+
+function badge(trend) {
+  const t = TREND[trend];
+  return `<span class="badge" style="color:${t.text};border-color:${t.color};background:${t.bg}">${t.label}</span>`;
+}
+
+function buildReport() {
+  document.getElementById('rep-date').textContent = `Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`;
+
+  const critical = MACHINES.filter(m => m.trend === 'critical').length;
+  const warning = MACHINES.filter(m => m.trend === 'warning').length;
+  const watch = MACHINES.filter(m => m.trend === 'watch').length;
+  const stable = MACHINES.filter(m => m.trend === 'stable').length;
+
+  document.getElementById('rep-kpis').innerHTML = `
+    <div class="card kpi">
+      <div class="kpi-val" style="color:#ef4444">${critical}</div>
+      <div class="kpi-lbl">CRÍTICOS</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:#f59e0b">${warning}</div>
+      <div class="kpi-lbl">ALERTA</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:#3b82f6">${watch}</div>
+      <div class="kpi-lbl">OBSERVAR</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:#22c55e">${stable}</div>
+      <div class="kpi-lbl">ESTÁVEIS</div>
+    </div>
+  `;
+
+  const tbody = document.getElementById('rep-table');
+  MACHINES.forEach((m, i) => {
+    const cur = m.allVib[IDX_CUTOFF];
+    const pct = ((cur / m.limit) * 100).toFixed(0);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:700;color:#4b5675">${i + 1}</td>
+      <td><strong>${m.name}</strong><br><span style="font-size:10px;color:#4b5675">${m.id}</span></td>
+      <td>${m.sector}</td>
+      <td style="font-family:monospace">${cur.toFixed(2)} ${m.unit}</td>
+      <td style="font-family:monospace;color:${TREND[m.trend].color}">${pct}%</td>
+      <td style="color:#a855f7">${DATE_BUY}</td>
+      <td style="color:#ef4444">${DATE_MAINT}</td>
+      <td>${badge(m.trend)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const steep = MACHINES.filter(m => m.trend === 'critical' || m.trend === 'warning');
+  const steepEl = document.getElementById('rep-steep');
+  steep.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'steep-item';
+    div.innerHTML = `
+      <strong style="color:${TREND[m.trend].color}">${m.name}</strong>
+      <span style="color:#4b5675"> — ${m.id} · ${m.sector}</span>
+      <span style="float:right;color:${TREND[m.trend].color};font-weight:700">${m.growth}</span>
+    `;
+    steepEl.appendChild(div);
+  });
+}
+
+buildReport();
+</script>
 </body>
 </html>
