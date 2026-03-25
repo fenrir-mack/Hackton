@@ -107,10 +107,10 @@
     <div><div class="logo-text">VibSense</div><div class="logo-sub">PREDICTIVE MAINTENANCE</div></div>
   </div>
   <ul class="tabs">
-      <li><a href="#" class="tab-link active">Visão Geral</a></li>
-      <li><a href="#" class="tab-link">Gráficos</a></li>
-      <li><a href="#" class="tab-link">Kanban</a></li>
-      <li><a href="#" class="tab-link">Relatórios</a></li>
+      <li><a href="{% url 'manutencao:visao_geral' %}" class="tab-link active">Visão Geral</a></li>
+      <li><a href="{% url 'manutencao:graficos' %}" class="tab-link">Gráficos</a></li>
+      <li><a href="{% url 'manutencao:kanban' %}" class="tab-link">Kanban</a></li>
+      <li><a href="{% url 'manutencao:relatorio' %}" class="tab-link">Relatórios</a></li>
   </ul>
   <div style="font-size: 12px; color: #16a34a; font-weight: 600;">● Sistema Online</div>
 </div>

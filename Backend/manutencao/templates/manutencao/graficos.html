@@ -7,42 +7,53 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
+  /* Reset e Estilo Global - Estilo Branco */
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #08090b; color: #dde2ea; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+  body { background: #f8fafc; color: #1e293b; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
 
+  /* Topbar */
   #topbar {
     position: sticky; top: 0; z-index: 200;
-    background: #0d0f13; border-bottom: 1px solid #1c2030;
-    display: flex; align-items: center; padding: 0 24px; height: 54px;
+    background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; padding: 0 24px; height: 64px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    gap: 20px;
   }
-  .logo { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
-  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; }
-  .logo-text { font-weight: 800; font-size: 15px; }
-  .logo-sub  { font-size: 9px; color: #4b5675; letter-spacing: 2px; }
-  .tabs { display: flex; gap: 2px; flex: 1; }
-  .tab-btn { background: none; border: none; cursor: pointer; color: #5a657a; font-size: 13px; font-weight: 500; padding: 6px 18px; border-radius: 7px; text-decoration: none; display: inline-block; }
-  .tab-btn:hover  { color: #9ba8be; background: #13161c; }
-  .tab-btn.active { color: #f59e0b; background: #1a1d26; border: 1px solid #252b3a; font-weight: 700; }
-  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4b5675; }
+  .logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; }
+  .logo-text { font-weight: 800; font-size: 15px; color: #0f172a; }
+  .logo-sub  { font-size: 9px; color: #64748b; letter-spacing: 2px; }
+
+  /* Tabs - Mantendo sua estrutura */
+  .tabs { display: flex; gap: 8px; flex: 1; list-style: none; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs li { display: inline-block; }
+  .tabs a {
+    text-decoration: none; color: #64748b; font-size: 13px; font-weight: 600;
+    padding: 8px 16px; border-radius: 8px; transition: 0.2s; white-space: nowrap;
+    border: 1px solid transparent; display: block;
+  }
+  .tabs a:hover { color: #0f172a; background: #f1f5f9; }
+  .tabs a.active { color: #f59e0b; background: #fffbeb; border: 1px solid #fef3c7; }
+
+  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; flex-shrink: 0; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
 
-  #alert-bar { background: #160606; border-bottom: 1px solid #5c1a1a; padding: 7px 24px; font-size: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  #alert-bar .lbl { color: #f87171; }
-  #alert-bar .nms { color: #ef4444; font-weight: 700; }
-
-  .tl-legend { display: flex; align-items: center; gap: 20px; padding: 7px 24px; background: #0d0f13; border-bottom: 1px solid #1c2030; font-size: 11px; color: #4b5675; flex-wrap: wrap; }
+  /* Legend Bar */
+  .tl-legend { display: flex; align-items: center; gap: 20px; padding: 10px 24px; background: #ffffff; border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #64748b; flex-wrap: wrap; }
   .tl-item { display: flex; align-items: center; gap: 6px; }
-  .tl-line { width: 28px; height: 2px; }
+  .tl-line { width: 28px; height: 2px; border-radius: 2px; }
 
   .panel { padding: 24px; }
-  .sec-title { font-size: 10px; color: #4b5675; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  .sec-title { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; }
 
+  /* Grid e Cards */
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .chart-box { background: #0d0f13; border: 1px solid #1c2030; border-radius: 12px; padding: 18px; }
-  .chart-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-  .chart-sub { font-size: 10px; color: #4b5675; margin-bottom: 12px; }
+  .chart-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .chart-title { font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+  .chart-sub { font-size: 11px; color: #64748b; margin-bottom: 16px; }
 
-  .badge { font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 2px 7px; border-radius: 4px; border: 1px solid; font-family: monospace; white-space: nowrap; }
+  .badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 5px; border: 1px solid; text-transform: uppercase; }
 
   @media(max-width:900px) { .grid2 { grid-template-columns: 1fr; } }
 </style>
@@ -56,34 +67,28 @@
   </div>
    <div class="tabs">
       <li><a href="{% url 'manutencao:visao_geral' %}">Visão Geral</a></li>
-      <li><a href="{% url 'manutencao:graficos' %}">Graficos</a></li>
+      <li><a href="{% url 'manutencao:graficos' %}"class="active">Graficos</a></li>
       <li><a href="{% url 'manutencao:kanban' %}">Kanban</a></li>
-      <li><a href="{% url 'manutencao:relatorio' %}" class="active">Relatorios</a></li>
+      <li><a href="{% url 'manutencao:relatorio' %}" >Relatorios</a></li>
   </div>
   <div class="live-dot"><div class="dot"></div><span>Dados até 20/01/2026</span></div>
 </div>
 
-
-
 <div class="tl-legend">
-  <div class="tl-item"><div class="tl-line" style="background:#3b82f6;height:2px"></div><span>Vibração real (medida)</span></div>
-  <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #4b5675"></div><span>Projeção</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#f59e0b;height:2px"></div><span>20/01/2026 — Corte dos dados</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#a855f7;height:2px"></div><span>20/04/2026 — Comprar peças</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#ef4444;height:2px"></div><span>08/08/2026 — Manutenção</span></div>
+  <div class="tl-item"><div class="tl-line" style="background:#3b82f6;"></div><span>Vibração real</span></div>
+  <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #94a3b8"></div><span>Projeção</span></div>
+  <div class="tl-item"><div class="tl-line" style="background:#f59e0b;"></div><span>20/01 — Corte</span></div>
+  <div class="tl-item"><div class="tl-line" style="background:#a855f7;"></div><span>20/04 — Peças</span></div>
+  <div class="tl-item"><div class="tl-line" style="background:#ef4444;"></div><span>08/08 — Manutenção</span></div>
 </div>
 
 <div class="panel">
-  <div class="sec-title">Todas as Curvas — Histórico até 20/01/2026 + Projeção até 08/08/2026</div>
+  <div class="sec-title">Histórico de Curvas e Projeção P-F</div>
   <div class="grid2" id="curves-grid"></div>
 </div>
 
 <script>
-const LABELS = [
-  "Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25",
-  "Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26","Ago/26"
-];
-
+const LABELS = ["Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26","Ago/26"];
 const IDX_CUTOFF = 6;
 
 function splitData(all) {
@@ -94,25 +99,19 @@ function splitData(all) {
 }
 
 const MACHINES = [
-  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", growth:"+62%",
-    allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s" },
-  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", growth:"+55%",
-    allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s" },
-  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", growth:"+41%",
-    allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s" },
-  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", growth:"+18%",
-    allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s" },
-  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", growth:"+15%",
-    allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s" },
-  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", growth:"+2%",
-    allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s" },
+  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", growth:"+62%", allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s" },
+  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", growth:"+55%", allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s" },
+  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", growth:"+41%", allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s" },
+  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", growth:"+18%", allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s" },
+  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", growth:"+15%", allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s" },
+  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", growth:"+2%", allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s" },
 ];
 
 const TREND = {
-  critical:{ label:"CRÍTICO", color:"#ef4444", bg:"#450a0a", text:"#fca5a5" },
-  warning: { label:"ALERTA", color:"#f59e0b", bg:"#431407", text:"#fcd34d" },
-  watch:   { label:"OBSERVAR", color:"#3b82f6", bg:"#0c1a3a", text:"#93c5fd" },
-  stable:  { label:"ESTÁVEL", color:"#22c55e", bg:"#052e16", text:"#86efac" },
+  critical:{ label:"CRÍTICO", color:"#dc2626", bg:"#fef2f2", text:"#991b1b" },
+  warning: { label:"ALERTA", color:"#d97706", bg:"#fffbeb", text:"#92400e" },
+  watch:   { label:"OBSERVAR", color:"#2563eb", bg:"#eff6ff", text:"#1e40af" },
+  stable:  { label:"ESTÁVEL", color:"#16a34a", bg:"#f0fdf4", text:"#166534" },
 };
 
 function badge(trend) {
@@ -122,15 +121,9 @@ function badge(trend) {
 
 function annotations() {
   return {
-    cutoff: { type:'line', scaleID:'x', value:"Jan/26", borderColor:'#f59e0b', borderWidth:2, borderDash:[5,4],
-      label:{ display:true, content:'20/01', backgroundColor:'#f59e0b18', color:'#f59e0b', font:{size:8,weight:'bold'}, position:'start', yAdjust:-6 }
-    },
-    buy: { type:'line', scaleID:'x', value:"Abr/26", borderColor:'#a855f7', borderWidth:2, borderDash:[5,4],
-      label:{ display:true, content:'20/04', backgroundColor:'#a855f718', color:'#a855f7', font:{size:8,weight:'bold'}, position:'start', yAdjust:-6 }
-    },
-    maint: { type:'line', scaleID:'x', value:"Ago/26", borderColor:'#ef4444', borderWidth:2, borderDash:[5,4],
-      label:{ display:true, content:'08/08', backgroundColor:'#ef444418', color:'#ef4444', font:{size:8,weight:'bold'}, position:'start', yAdjust:-6 }
-    },
+    cutoff: { type:'line', scaleID:'x', value:"Jan/26", borderColor:'#f59e0b', borderWidth:2, borderDash:[5,4] },
+    buy: { type:'line', scaleID:'x', value:"Abr/26", borderColor:'#a855f7', borderWidth:2, borderDash:[5,4] },
+    maint: { type:'line', scaleID:'x', value:"Ago/26", borderColor:'#ef4444', borderWidth:2, borderDash:[5,4] },
   };
 }
 
@@ -138,9 +131,9 @@ function makeDatasets(m) {
   const t = TREND[m.trend];
   const { real, proj } = splitData(m.allVib);
   return [
-    { label:'Vibração real', data:real, borderColor:t.color, backgroundColor:t.color+'22', borderWidth:2, pointRadius:2, fill:true, tension:.35, spanGaps:false },
-    { label:'Projeção', data:proj, borderColor:'#64748b', backgroundColor:'transparent', borderWidth:1.5, borderDash:[6,4], pointRadius:1, fill:false, tension:.35, spanGaps:false },
-    { label:`Limite`, data:LABELS.map(()=>m.limit), borderColor:'#ef444466', backgroundColor:'transparent', borderWidth:1.5, borderDash:[3,3], pointRadius:0, fill:false },
+    { label:'Real', data:real, borderColor:t.color, backgroundColor:t.color+'15', borderWidth:2.5, pointRadius:3, fill:true, tension:.35 },
+    { label:'Projeção', data:proj, borderColor:'#94a3b8', backgroundColor:'transparent', borderWidth:2, borderDash:[6,4], pointRadius:0, fill:false, tension:.35 },
+    { label:`Limite`, data:LABELS.map(()=>m.limit), borderColor:'#ef444444', borderWidth:1.5, borderDash:[3,3], pointRadius:0 },
   ];
 }
 
@@ -152,13 +145,13 @@ function chartConfig(m) {
       responsive:true, animation:false,
       plugins:{
         legend:{ display:false },
-        tooltip:{ backgroundColor:'#0d0f13', borderColor:'#1c2030', borderWidth:1, titleColor:'#4b5675', bodyColor:'#dde2ea' },
+        tooltip:{ backgroundColor:'#ffffff', titleColor:'#0f172a', bodyColor:'#64748b', borderColor:'#e2e8f0', borderWidth:1 },
         annotation:{ annotations:annotations() }
       },
       scales:{
-        x:{ ticks:{ color:'#4b5675', font:{size:8} }, grid:{ color:'#1c2030' } },
-        y:{ ticks:{ color:'#4b5675', font:{size:8} }, grid:{ color:'#1c2030' }, suggestedMin:0, suggestedMax:m.limit*1.35,
-            title:{ display:true, text:m.unit, color:'#4b5675', font:{size:8} } }
+        x:{ ticks:{ color:'#94a3b8', font:{size:9} }, grid:{ color:'#f1f5f9' } },
+        y:{ ticks:{ color:'#94a3b8', font:{size:9} }, grid:{ color:'#f1f5f9' }, suggestedMin:0, suggestedMax:m.limit*1.3,
+            title:{ display:false } }
       }
     }
   };
@@ -170,18 +163,16 @@ function buildCurvesGrid() {
     const box = document.createElement('div');
     box.className = 'chart-box';
     box.innerHTML = `
-      <div class="chart-title">${m.name} ${badge(m.trend)}</div>
+      <div class="chart-title"><span>${m.name}</span> ${badge(m.trend)}</div>
       <div class="chart-sub">${m.id} · ${m.sector} · Limite: ${m.limit} ${m.unit}</div>
-      <canvas id="curve-${m.id}" height="160"></canvas>
+      <canvas id="curve-${m.id}" height="180"></canvas>
     `;
     grid.appendChild(box);
   });
-
   MACHINES.forEach(m => {
     new Chart(document.getElementById('curve-'+m.id), chartConfig(m));
   });
 }
-
 buildCurvesGrid();
 </script>
 </body>
