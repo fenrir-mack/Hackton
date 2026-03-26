@@ -1,112 +1,303 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Visão Geral do Motor</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEKNIKAO – Visão Geral</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f8fafc; color: #1e293b; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f4f6f8;
-        }
+  /* Topbar */
+  #topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; padding: 0 24px; height: 56px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .logo { display: flex; align-items: center; margin-right: 40px; }
+  .logo-text { font-weight: 900; font-size: 18px; color: #0f172a; letter-spacing: -0.5px; text-transform: uppercase; }
 
-        h1 {
-            color: #333;
-        }
+  .tabs { display: flex; gap: 4px; flex: 1; list-style: none; }
+  .tab-link {
+    text-decoration: none; color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 7px; transition: 0.2s;
+  }
+  .tab-link:hover { color: #0f172a; background: #f1f5f9; }
+  .tab-link.active { color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; font-weight: 700; }
 
-        .card {
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
+  /* Novo Botão Atualizar na Topbar */
+  .btn-refresh {
+    padding: 8px 16px; background: #ffffff; border: 1px solid #e2e8f0;
+    border-radius: 8px; color: #475569; font-size: 12px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-refresh:hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
 
-        .alerta {
-            color: #b30000;
-            font-weight: bold;
-        }
+  .spinner { width: 14px; height: 14px; border: 2px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; display: none; }
+  .btn-refresh.loading .spinner { display: block; animation: spin 0.8s linear infinite; }
+  .btn-refresh.loading .icon-static { display: none; }
 
-        .ok {
-            color: green;
-            font-weight: bold;
-        }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+  /* Filtros e Botões */
+  .sidebar-controls { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 
-        th, td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
+  .btn-filter {
+    padding: 6px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px;
+    font-size: 11px; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-filter:hover { background: #f8fafc; border-color: #cbd5e1; }
 
-        th {
-            background-color: #eee;
-        }
-    </style>
+  .filter-tray {
+    position: absolute; top: 35px; right: 0; width: 200px; background: white;
+    border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; display: none;
+  }
+  .filter-tray.active { display: block; }
+  .filter-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 11px; font-weight: 600; color: #475569; }
+  .filter-item:last-child { margin-bottom: 0; padding-top: 8px; border-top: 1px solid #f1f5f9; }
+
+  .tgl { position: relative; width: 30px; height: 16px; background: #e2e8f0; border-radius: 20px; cursor: pointer; transition: 0.3s; }
+  .tgl::after { content: ''; position: absolute; width: 12px; height: 12px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
+  input:checked + .tgl { background: #3b82f6; }
+  input:checked + .tgl::after { left: 16px; }
+  .filter-item input { display: none; }
+
+  #alert-bar { background: #fef2f2; border-bottom: 1px solid #fee2e2; padding: 10px 24px; font-size: 12px; color: #991b1b; display: flex; align-items: center; gap: 8px; }
+  .panel { padding: 24px; }
+  .sec-title { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; }
+  #ov-layout { display: grid; grid-template-columns: 350px 1fr; gap: 24px; }
+  .sidebar-container { display: flex; flex-direction: column; gap: 12px; }
+  .search-box { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; outline: none; margin-bottom: 4px; }
+
+  .prio-row { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; background: #ffffff; cursor: pointer; margin-bottom: 10px; position: relative; transition: 0.2s; }
+  .prio-row.selected { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08); }
+  .prio-row.is-hidden { opacity: 0.4; background: #f1f5f9; border-style: dashed; }
+  .prio-header { display: flex; justify-content: space-between; align-items: center; padding-right: 25px; }
+  .prio-name { font-weight: 700; font-size: 14px; }
+  .hide-btn { position: absolute; right: 12px; top: 18px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; }
+  .badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 5px; border: 1px solid; text-transform: uppercase; }
+  .prio-details { display: flex; justify-content: space-between; font-size: 11px; color: #64748b; }
+
+  .chart-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+  .milestone-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .milestone { flex: 1; min-width: 140px; border-radius: 10px; padding: 12px; border: 1px solid #e2e8f0; background: #f8fafc; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+  .card-kpi { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; }
+  .kpi-val { font-size: 28px; font-weight: 900; }
+
+  @media(max-width:1100px) { #ov-layout { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 
-    <h1>📊 Visão Geral do Motor</h1>
+<div id="topbar">
+  <div class="logo"><div class="logo-text">Teknikao</div></div>
+  <ul class="tabs">
+      <li><a href="{% url 'manutencao:visao_geral' %}" class="tab-link active">Visão Geral</a></li>
+      <li><a href="{% url 'manutencao:graficos' %}" class="tab-link">Gráficos</a></li>
+      <li><a href="{% url 'manutencao:kanban' %}" class="tab-link">Kanban</a></li>
+      <li><a href="{% url 'manutencao:relatorio' %}" class="tab-link">Relatórios</a></li>
+  </ul>
 
-    <!-- 🔹 Info do Motor -->
-    <div class="card">
-        <h2>Informações</h2>
-        <p><strong>Usina:</strong> {{ motor.usina }}</p>
-        <p><strong>Sala:</strong> {{ motor.sala }}</p>
-        <p><strong>Sub Sala:</strong> {{ motor.sub_sala }}</p>
-        <p><strong>Motor:</strong> {{ motor.nome }}</p>
-        <p><strong>Configuração:</strong> {{ motor.configuracao }}</p>
-        <p><strong>Nível 1:</strong> {{ motor.nivel1 }}</p>
-        <p><strong>Nível 2:</strong> {{ motor.nivel2 }}</p>
+  <button class="btn-refresh" id="btn-refresh" onclick="triggerRefresh()">
+    <span class="spinner"></span>
+    <span class="icon-static">🔄</span>
+    <span id="btn-text">Atualizar Dados</span>
+  </button>
+</div>
+
+
+
+<div class="panel">
+  <div id="ov-layout">
+    <div class="sidebar-container">
+      <div class="sidebar-controls">
+        <div class="sec-title" style="margin-bottom:0">Ativos Industriais</div>
+        <button class="btn-filter" onclick="toggleTray()">
+          <span>⚙️ Filtros</span>
+        </button>
+
+        <div class="filter-tray" id="filter-tray">
+          <div class="filter-item"><span>🔴 Crítico</span> <label><input type="checkbox" checked onchange="renderList()" data-filter="critical"><div class="tgl"></div></label></div>
+          <div class="filter-item"><span>🟠 Alerta</span> <label><input type="checkbox" checked onchange="renderList()" data-filter="warning"><div class="tgl"></div></label></div>
+          <div class="filter-item"><span>🔵 Observar</span> <label><input type="checkbox" checked onchange="renderList()" data-filter="watch"><div class="tgl"></div></label></div>
+          <div class="filter-item"><span>🟢 Estável</span> <label><input type="checkbox" checked onchange="renderList()" data-filter="stable"><div class="tgl"></div></label></div>
+          <div class="filter-item"><span>👁️ Ver Ocultos</span> <label><input type="checkbox" id="show-hidden-toggle" onchange="renderList()"><div class="tgl"></div></label></div>
+        </div>
+      </div>
+
+      <input type="text" id="machine-search" class="search-box" placeholder="Pesquisar máquina...">
+      <div id="prio-list"></div>
+      <div class="pagination" id="pagination"></div>
     </div>
 
-    <!-- 🔹 Status -->
-    <div class="card">
-        <h2>Status</h2>
-
-        {% if motor.resultado.manutencao_recente %}
-            <p class="alerta">⚠️ Manutenção recente detectada</p>
-        {% else %}
-            <p class="ok">✅ Sem manutenção recente</p>
-        {% endif %}
-
-        {% if motor.resultado.ja_bateu_no_limite %}
-            <p class="alerta">🚨 Já bateu no limite crítico</p>
-        {% else %}
-            <p class="ok">✅ Dentro dos limites</p>
-        {% endif %}
+    <div>
+      <div class="sec-title">Análise de Tendência</div>
+      <div class="chart-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div>
+            <div id="det-name" style="font-weight:800;font-size:18px;color:#0f172a"></div>
+            <div id="det-sub" style="font-size:12px;color:#64748b"></div>
+          </div>
+          <span id="det-badge" class="badge"></span>
+        </div>
+        <canvas id="det-chart" height="180"></canvas>
+      </div>
+    <div class="grid3" id="det-kpis">
     </div>
-
-    <!-- 🔹 Dados -->
-    <div class="card">
-        <h2>Histórico RMS</h2>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>RMS</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ponto in dados %}
-                    <tr>
-                        <td>{{ ponto.data }}</td>
-                        <td>{{ ponto.rms }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="2">Nenhum dado disponível</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
+  </div>
+</div>
 
+<script>
+const MACHINES = [
+  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", nextMaint:"08/08/2026", growth:"+62%", allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s", hidden: false },
+  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", nextMaint:"12/08/2026", growth:"+55%", allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s", hidden: false },
+  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", nextMaint:"15/09/2026", growth:"+41%", allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s", hidden: false },
+  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", nextMaint:"10/11/2026", growth:"+18%", allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s", hidden: false },
+  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", nextMaint:"22/11/2026", growth:"+15%", allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s", hidden: false },
+  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", nextMaint:"05/01/2027", growth:"+2%", allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s", hidden: false },
+];
+
+const TREND = {
+  critical:{ label:"CRÍTICO", color:"#dc2626", bg:"#fef2f2", text:"#991b1b" },
+  warning: { label:"ALERTA", color:"#d97706", bg:"#fffbeb", text:"#92400e" },
+  watch:   { label:"OBSERVAR", color:"#2563eb", bg:"#eff6ff", text:"#1e40af" },
+  stable:  { label:"ESTÁVEL", color:"#16a34a", bg:"#f0fdf4", text:"#166534" },
+};
+
+let currentPage = 1;
+const itemsPerPage = 10;
+let detChart = null;
+let currentSelectedId = "M-01";
+
+function toggleTray() {
+  document.getElementById('filter-tray').classList.toggle('active');
+}
+
+window.onclick = function(event) {
+  if (!event.target.closest('.sidebar-controls')) {
+    document.getElementById('filter-tray').classList.remove('active');
+  }
+}
+
+function triggerRefresh() {
+  const btn = document.getElementById('btn-refresh');
+  if (btn.classList.contains('loading')) return;
+  btn.classList.add('loading');
+  document.getElementById('btn-text').innerText = "Sincronizando...";
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    document.getElementById('btn-text').innerText = "Atualizar Dados";
+    renderList();
+  }, 1000);
+}
+
+function toggleHideMachine(e, id) {
+  e.stopPropagation();
+  const m = MACHINES.find(x => x.id === id);
+  if (m) { m.hidden = !m.hidden; renderList(); }
+}
+
+function renderList() {
+  const list = document.getElementById('prio-list');
+  const showHidden = document.getElementById('show-hidden-toggle').checked;
+  const searchTerm = document.getElementById('machine-search').value.toLowerCase();
+  const activeStatus = Array.from(document.querySelectorAll('[data-filter]:checked')).map(el => el.dataset.filter);
+
+  list.innerHTML = '';
+  const displayItems = MACHINES.filter(m => {
+    const matchesSearch = m.name.toLowerCase().includes(searchTerm) || m.sector.toLowerCase().includes(searchTerm);
+    const matchesStatus = activeStatus.includes(m.trend);
+    const shouldShowBasedOnHidden = showHidden ? true : !m.hidden;
+    return matchesSearch && matchesStatus && shouldShowBasedOnHidden;
+  });
+
+  const start = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = displayItems.slice(start, start + itemsPerPage);
+
+  paginatedItems.forEach((m) => {
+    const t = TREND[m.trend];
+    const row = document.createElement('div');
+    row.className = `prio-row ${m.id === currentSelectedId ? 'selected' : ''} ${m.hidden ? 'is-hidden' : ''}`;
+    row.innerHTML = `
+      <button class="hide-btn" onclick="toggleHideMachine(event, '${m.id}')">${m.hidden ? '👁️‍' : '👁️'}</button>
+      <div class="prio-header">
+        <div class="prio-name">${m.name}</div>
+        <span class="badge" style="background:${t.bg}; color:${t.text}; border-color:${t.color}">${t.label}</span>
+      </div>
+      <div class="prio-details"><span>Setor: ${m.sector}</span><span class="maint-date">📅 ${m.nextMaint}</span></div>
+    `;
+    row.onclick = () => selectMachine(m.id);
+    list.appendChild(row);
+  });
+  renderPagination(displayItems.length);
+}
+
+function renderPagination(totalCount) {
+  const pag = document.getElementById('pagination');
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  pag.innerHTML = '';
+  if (totalPages <= 1) return;
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.className = `pg-btn ${i === currentPage ? 'active' : ''}`;
+    btn.textContent = i;
+    btn.onclick = () => { currentPage = i; renderList(); };
+    pag.appendChild(btn);
+  }
+}
+
+document.getElementById('machine-search').oninput = () => { currentPage = 1; renderList(); };
+
+function selectMachine(id) {
+  currentSelectedId = id;
+  renderList();
+  const m = MACHINES.find(x => x.id === id);
+  const t = TREND[m.trend];
+  const cur = m.allVib[6];
+  document.getElementById('det-name').textContent = m.name;
+  document.getElementById('det-sub').textContent = `${m.id} • ${m.sector} • Tendência ${m.growth}`;
+  const b = document.getElementById('det-badge');
+  b.textContent = t.label; b.style.color = t.text; b.style.background = t.bg; b.style.borderColor = t.color;
+  document.getElementById('det-kpis').innerHTML = `
+  <div class="card-kpi">
+    <div class="kpi-val">${cur.toFixed(2)}</div>
+    <div class="kpi-lbl">${m.unit.toUpperCase()} ATUAL</div>
+  </div>
+
+  <div class="card-kpi">
+    <div class="kpi-val">${((cur/m.limit)*100).toFixed(0)}%</div>
+    <div class="kpi-lbl">DO LIMITE</div>
+  </div>
+
+  <div class="card-kpi">
+    <div class="kpi-val">${m.nextMaint}</div>
+    <div class="kpi-lbl">MANUTENÇÃO</div>
+    <div style="font-size:11px;color:#64748b;margin-top:4px;">Parada prevista</div>
+  </div>
+`;
+  if (detChart) detChart.destroy();
+  const ctx = document.getElementById('det-chart').getContext('2d');
+  detChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ["Jul","Ago","Set","Out","Nov","Dez","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago"],
+      datasets: [
+        { label: 'Real', data: m.allVib.map((v,i)=> i<=6?v:null), borderColor: t.color, tension: 0.3, fill: true, backgroundColor: t.color+'10' },
+        { label: 'Previsão', data: m.allVib.map((v,i)=> i>=6?v:null), borderColor: '#94a3b8', borderDash: [5,5], tension: 0.3 }
+      ]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+  });
+}
+
+renderList();
+selectMachine(MACHINES[0].id);
+</script>
 </body>
 </html>

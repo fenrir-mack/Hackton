@@ -3,143 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VibSense – Kanban</title>
+<title>TEKNIKAO – Gestão de Peças e Manutenção</title>
 <style>
+  /* Reset e Estilo Global */
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #08090b; color: #dde2ea; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+  body {
+    background: #f8fafc;
+    color: #1e293b;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
 
+  /* Topbar */
   #topbar {
     position: sticky; top: 0; z-index: 200;
-    background: #0d0f13; border-bottom: 1px solid #1c2030;
-    display: flex; align-items: center; padding: 0 24px; height: 54px;
+    background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; padding: 0 24px; height: 56px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
-  .logo { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
-  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; }
-  .logo-text { font-weight: 800; font-size: 15px; }
-  .logo-sub  { font-size: 9px; color: #4b5675; letter-spacing: 2px; }
-  .tabs { display: flex; gap: 2px; flex: 1; }
-  .tab-btn { background: none; border: none; cursor: pointer; color: #5a657a; font-size: 13px; font-weight: 500; padding: 6px 18px; border-radius: 7px; text-decoration: none; display: inline-block; }
-  .tab-btn:hover  { color: #9ba8be; background: #13161c; }
-  .tab-btn.active { color: #f59e0b; background: #1a1d26; border: 1px solid #252b3a; font-weight: 700; }
-  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #4b5675; }
+  .logo { display: flex; align-items: center; margin-right: 40px; }
+  .logo-text { font-weight: 900; font-size: 18px; color: #0f172a; letter-spacing: -0.5px; text-transform: uppercase; }
+
+  .tabs { display: flex; gap: 4px; flex: 1; list-style: none; }
+  .tab-link {
+    text-decoration: none; color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 7px; transition: 0.2s;
+  }
+  .tab-link:hover { color: #0f172a; background: #f1f5f9; }
+  .tab-link.active { color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; font-weight: 700; }
+
+  .status-online { font-size: 11px; color: #16a34a; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .status-online span { display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
+
+  .sub-bar {
+    padding: 10px 24px; background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; font-weight: 600; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
 
-  #alert-bar { background: #160606; border-bottom: 1px solid #5c1a1a; padding: 7px 24px; font-size: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  #alert-bar .lbl { color: #f87171; }
-  #alert-bar .nms { color: #ef4444; font-weight: 700; }
-
-  .tl-legend { display: flex; align-items: center; gap: 20px; padding: 7px 24px; background: #0d0f13; border-bottom: 1px solid #1c2030; font-size: 11px; color: #4b5675; flex-wrap: wrap; }
-  .tl-item { display: flex; align-items: center; gap: 6px; }
-  .tl-line { width: 28px; height: 2px; }
-
   .panel { padding: 24px; }
-  .sec-title { font-size: 10px; color: #4b5675; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  .sec-title { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; font-weight: 700; }
 
-  .kb-board { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
-  .kb-col   { background: #0d0f13; border: 1px solid #1c2030; border-radius: 12px; padding: 14px; min-height: 200px; }
-  .kb-col-header { font-size: 12px; font-weight: 700; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #1c2030; display: flex; justify-content: space-between; align-items: center; }
-  .kb-count   { background: #08090b; color: #4b5675; border-radius: 10px; padding: 1px 8px; font-size: 11px; font-family: monospace; }
-  .kb-card    { background: #08090b; border: 1px solid #1c2030; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
-  .kb-machine { font-size: 10px; color: #4b5675; margin-bottom: 4px; font-family: monospace; }
-  .kb-task    { font-size: 13px; color: #dde2ea; font-weight: 600; margin-bottom: 8px; }
-  .kb-meta    { display: flex; justify-content: space-between; font-size: 11px; }
-  .kb-who { color: #4b5675; }
-  .kb-due { color: #f59e0b; }
+  /* Kanban Board */
+  .kb-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: start; }
 
-  @media(max-width:900px) { .kb-board { grid-template-columns: 1fr; } }
+  .kb-col {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kb-col-header {
+    padding: 16px;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #475569; /* Cor Neutra */
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .kb-count { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 11px; }
+
+  .kb-cards-container { padding: 10px; flex-grow: 1; min-height: 100px; }
+
+  .kb-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: grab;
+    transition: all 0.2s;
+  }
+  .kb-card:hover { border-color: #cbd5e1; transform: translateY(-1px); }
+
+  .kb-machine { font-size: 10px; color: #94a3b8; margin-bottom: 6px; font-family: monospace; font-weight: 700; text-transform: uppercase; }
+  .kb-task { font-size: 13px; color: #334155; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+  .kb-part { font-size: 11px; color: #64748b; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 12px; display: inline-block; width: 100%;}
+
+  .kb-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+  }
+  .kb-who { color: #64748b; }
+  .kb-due { color: #475569; font-weight: 700; }
+
+  .priority-high { color: #ef4444; background: #fef2f2; padding: 2px 4px; border-radius: 4px; }
+
+  @media(max-width:1100px) { .kb-board { grid-template-columns: repeat(2, 1fr); } }
+  @media(max-width:650px) { .kb-board { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <div id="topbar">
-  <div class="logo">
-    <div class="logo-icon">⚡</div>
-    <div><div class="logo-text">VibSense</div><div class="logo-sub">PREDICTIVE MAINTENANCE</div></div>
+  <div class="logo"><div class="logo-text">Teknikao</div></div>
+  <ul class="tabs">
+      <li><a href="{% url 'manutencao:visao_geral' %}" class="tab-link">Visão Geral</a></li>
+      <li><a href="{% url 'manutencao:graficos' %}" class="tab-link">Gráficos</a></li>
+      <li><a href="{% url 'manutencao:kanban' %}" class="tab-link active">Kanban</a></li>
+      <li><a href="{% url 'manutencao:relatorio' %}" class="tab-link">Relatórios</a></li>
+  </ul>
+  <div class="status-online">
+    <span></span>SISTEMA ONLINE
   </div>
-   <div class="tabs">
-      <li><a href="{% url 'manutencao:visao_geral' %}">Visão Geral</a></li>
-      <li><a href="{% url 'manutencao:graficos' %}">Graficos</a></li>
-      <li><a href="{% url 'manutencao:kanban' %}">Kanban</a></li>
-      <li><a href="{% url 'manutencao:relatorio' %}" class="active">Relatorios</a></li>
-  </div>
-  <div class="live-dot"><div class="dot"></div><span>Dados até 20/01/2026</span></div>
 </div>
 
-
-<div class="tl-legend">
-  <div class="tl-item"><div class="tl-line" style="background:#3b82f6;height:2px"></div><span>Vibração real (medida)</span></div>
-  <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #4b5675"></div><span>Projeção</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#f59e0b;height:2px"></div><span>20/01/2026 — Corte dos dados</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#a855f7;height:2px"></div><span>20/04/2026 — Comprar peças</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#ef4444;height:2px"></div><span>08/08/2026 — Manutenção</span></div>
-</div>
 
 <div class="panel">
-  <div class="sec-title">Gestão de Manutenção</div>
+  <div class="sec-title">Fluxo de Aquisição e Substituição de Ativos</div>
   <div class="kb-board" id="kb-board"></div>
 </div>
 
 <script>
-const KANBAN = {
-  urgente:      { label:"Urgente",      color:"#ef4444", icon:"🔴" },
-  em_andamento: { label:"Em Andamento", color:"#f59e0b", icon:"🟡" },
-  agendado:     { label:"Agendado",     color:"#3b82f6", icon:"🔵" },
-  concluido:    { label:"Concluído",    color:"#22c55e", icon:"✅" },
+const COLUMNS = {
+  cotacao:     { label:"Cotação / Pendente" },
+  compra:      { label:"Em Compra / Trânsito" },
+  substituicao: { label:"Aguardando Troca" },
+  finalizado:  { label:"Manutenção Concluída" },
 };
 
-const KB_CARDS = {
-  urgente:[
-    { machine:"Compressor Alpha",  task:"Solicitar orçamento — rolamento principal", due:"Fev/26", who:"Carlos M." },
-    { machine:"Ventilador CV-07",  task:"Solicitar orçamento — hélice e eixo",       due:"Fev/26", who:"Ana R." },
+let KB_DATA = {
+  cotacao:[
+    { id: 1, machine:"Exaustor Central E-04", task:"Troca Preventiva (Vibração Elevada)", part:"Rolamento SKF Explorer", due:"URGENTE", who:"Dept. Compras" },
+    { id: 2, machine:"Bomba Hidráulica B-02", task:"Vazamento detectado no selo", part:"Selo Mecânico Viton", due:"05 dias", who:"Eng. Manutenção" },
   ],
-  em_andamento:[
-    { machine:"Motor Bomba B2",    task:"Levantar fornecedores — lubrificante",      due:"Mar/26", who:"Pedro L." },
-    { machine:"Torno CNC 3",       task:"Planejar parada programada",                due:"Mar/26", who:"Julia S." },
+  compra:[
+    { id: 3, machine:"Compressor Parafuso CP-01", task:"Kit de filtros (3000h)", part:"Kit Manutenção Atlas Copco", due:"28/03", who:"Logística" },
   ],
-  agendado:[
-    { machine:"Compressor Alpha",  task:"Comprar peças — prazo 20/04/2026",       due:"20/Abr/26", who:"Carlos M." },
-    { machine:"Ventilador CV-07",  task:"Comprar peças — prazo 20/04/2026",       due:"20/Abr/26", who:"Ana R." },
-    { machine:"Todos",             task:"Manutenção programada — 08/08/2026",     due:"08/Ago/26", who:"Equipe" },
+  substituicao:[
+    { id: 4, machine:"Motor Transportadora T-10", task:"Alinhamento e Troca de Polia", part:"Polia em V - Perfil B", due:"Sábado 08:00", who:"Téc. Roberto" },
   ],
-  concluido:[
-    { machine:"Prensa H-12",       task:"Troca de fluido hidráulico",                due:"20/Jan/26", who:"Marcos F." },
-    { machine:"Bomba Centrif. P3", task:"Substituição de vedação",                   due:"15/Jan/26", who:"Ana R." },
+  finalizado:[
+    { id: 5, machine:"Resfriador R-09", task:"Substituição de correias", part:"Conjunto Correias Gates", due:"24/03", who:"Téc. Carlos" },
   ],
 };
 
-function buildKanban() {
+function renderBoard() {
   const board = document.getElementById('kb-board');
-  Object.keys(KANBAN).forEach(key => {
-    const col = KANBAN[key];
-    const cards = KB_CARDS[key] || [];
+  board.innerHTML = '';
+
+  Object.keys(COLUMNS).forEach(colKey => {
+    const colCfg = COLUMNS[colKey];
+    const cards = KB_DATA[colKey] || [];
+
     const colEl = document.createElement('div');
     colEl.className = 'kb-col';
     colEl.innerHTML = `
-      <div class="kb-col-header" style="color:${col.color}">
-        <span>${col.icon} ${col.label}</span>
+      <div class="kb-col-header">
+        <span>${colCfg.label}</span>
         <span class="kb-count">${cards.length}</span>
       </div>
-      <div class="kb-cards"></div>
+      <div class="kb-cards-container" data-status="${colKey}"></div>
     `;
-    const cardsContainer = colEl.querySelector('.kb-cards');
-    cards.forEach(c => {
+
+    const container = colEl.querySelector('.kb-cards-container');
+
+    cards.forEach(card => {
       const cardEl = document.createElement('div');
       cardEl.className = 'kb-card';
+      cardEl.draggable = true;
+
+      const isUrgent = card.due.toLowerCase().includes('urgente');
+
       cardEl.innerHTML = `
-        <div class="kb-machine">${c.machine}</div>
-        <div class="kb-task">${c.task}</div>
+        <div class="kb-machine">${card.machine}</div>
+        <div class="kb-task">${card.task}</div>
+        <div class="kb-part">Peça: ${card.part}</div>
         <div class="kb-meta">
-          <span class="kb-who">${c.who}</span>
-          <span class="kb-due">${c.due}</span>
+          <span class="kb-who">Resp: ${card.who}</span>
+          <span class="kb-due ${isUrgent ? 'priority-high' : ''}">${card.due}</span>
         </div>
       `;
-      cardsContainer.appendChild(cardEl);
+
+      cardEl.addEventListener('dragstart', () => {
+        cardEl.classList.add('dragging');
+        window.draggedCardId = card.id;
+      });
+      cardEl.addEventListener('dragend', () => cardEl.classList.remove('dragging'));
+
+      container.appendChild(cardEl);
     });
+
+    colEl.addEventListener('dragover', e => {
+      e.preventDefault();
+      colEl.classList.add('drag-over');
+    });
+    colEl.addEventListener('dragleave', () => colEl.classList.remove('drag-over'));
+    colEl.addEventListener('drop', e => {
+      e.preventDefault();
+      colEl.classList.remove('drag-over');
+      moveCard(window.draggedCardId, colKey);
+    });
+
     board.appendChild(colEl);
   });
 }
 
-buildKanban();
+function moveCard(cardId, newStatus) {
+  let foundCard = null;
+  Object.keys(KB_DATA).forEach(status => {
+    const idx = KB_DATA[status].findIndex(c => c.id == cardId);
+    if (idx > -1) foundCard = KB_DATA[status].splice(idx, 1)[0];
+  });
+  if (foundCard) {
+    KB_DATA[newStatus].push(foundCard);
+    renderBoard();
+  }
+}
+
+renderBoard();
 </script>
 </body>
 </html>
