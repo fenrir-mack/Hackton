@@ -6,10 +6,15 @@
 <title>TEKNIKAO – Visão Geral</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-<style>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #f8fafc; color: #1e293b; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
-
+    .sticky-area {
+  position: sticky;
+  top: 80px; /* altura da topbar + respiro */
+  align-self: start;
+}
   /* Topbar */
   #topbar {
     position: sticky; top: 0; z-index: 200;
@@ -147,7 +152,7 @@
       <div class="pagination" id="pagination"></div>
     </div>
 
-    <div>
+    <div class="sticky-area">
       <div class="sec-title">Análise de Tendência</div>
       <div class="chart-box">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -204,7 +209,10 @@ function computeTrend(medicoes, nivel1, nivel2) {
   if (last >= nivel1 * 0.7)   return 'watch';
   return 'stable';
 }
-
+function parseDateBR(dateStr) {
+  const [d, m, y] = dateStr.split('/');
+  return `${y}-${m}-${d}`;
+}
 function computeGrowth(medicoes) {
   const reais = medicoes.filter(m => m.tipo !== 'limite');
   if (reais.length < 2) return '+0%';
@@ -345,18 +353,22 @@ function selectMachine(id) {
   const lastReal = reais[reais.length - 1];
 
   // Labels: todas as datas
-  const labels = m.medicoes.map(x => x.data);
+  const realData = m.medicoes
+  .filter(x => x.tipo !== 'limite')
+  .map(x => ({
+    x: parseDateBR(x.data),
+    y: x.rms
+  }));
 
-  // Dataset real: todos os pontos até (e incluindo) o último real; null no ponto de previsão
-  const realData = m.medicoes.map(x => (x.tipo !== 'limite' ? x.rms : null));
-
-  // Dataset previsão: null em tudo, exceto último real + ponto limite
-  //  — isso cria a linha tracejada que "parte" do último ponto real
-  const forecastData = m.medicoes.map((x, i) => {
-    const isLastReal  = (x === lastReal);
-    const isLimite    = (x.tipo === 'limite');
-    return (isLastReal || isLimite) ? x.rms : null;
-  });
+const forecastData = m.medicoes
+  .filter((x, i) => {
+    const isLastReal = m.medicoes[i] === lastReal;
+    return isLastReal || x.tipo === 'limite';
+  })
+  .map(x => ({
+    x: parseDateBR(x.data),
+    y: x.rms
+  }));
 
   // ── Cabeçalho ──────────────────────────────
   document.getElementById('det-name').textContent = m.name;
@@ -394,7 +406,6 @@ function selectMachine(id) {
   detChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels,
       datasets: [
         {
           // Linha real — sólida, cor do status
@@ -490,13 +501,19 @@ function selectMachine(id) {
           ticks: { callback: v => v.toFixed(1) + ' ' + m.unit },
         },
         x: {
+          type: 'time',
+          time: {
+            unit: 'month', // pode mudar depois se quiser
+            displayFormats: {
+              month: 'MM/yyyy'
+            }
+          },
           grid: { display: false },
           ticks: {
-            maxTicksLimit: 12,
             maxRotation: 45,
-            font: { size: 10 },
-          },
-        },
+            font: { size: 10 }
+          }
+        }
       },
     },
   });
