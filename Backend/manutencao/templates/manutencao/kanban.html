@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VibSense – Kanban (Light)</title>
+<title>TEKNIKAO – Gestão de Peças e Manutenção</title>
 <style>
+  /* Reset e Estilo Global */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: #f8fafc;
@@ -14,47 +15,46 @@
     min-height: 100vh;
   }
 
-  /* Topbar - Versão Clara */
+  /* Topbar Sincronizada */
   #topbar {
     position: sticky; top: 0; z-index: 200;
     background: #ffffff; border-bottom: 1px solid #e2e8f0;
     display: flex; align-items: center; padding: 0 24px; height: 56px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
-  .logo { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
-  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; }
-  .logo-text { font-weight: 800; font-size: 15px; color: #0f172a; }
-  .logo-sub  { font-size: 9px; color: #64748b; letter-spacing: 2px; }
+  .logo { display: flex; align-items: center; margin-right: 40px; }
+  .logo-text { font-weight: 900; font-size: 18px; color: #0f172a; letter-spacing: -0.5px; text-transform: uppercase; }
 
-  /* Tabs */
   .tabs { display: flex; gap: 4px; flex: 1; list-style: none; }
   .tab-link {
-    text-decoration: none;
-    color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px;
-    border-radius: 7px; transition: 0.2s; border: 1px solid transparent;
+    text-decoration: none; color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 7px; transition: 0.2s;
   }
   .tab-link:hover { color: #0f172a; background: #f1f5f9; }
-  .tab-link.active { color: #f59e0b; background: #fffbeb; border: 1px solid #fef3c7; font-weight: 700; }
+  .tab-link.active { color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; font-weight: 700; }
 
-  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+  /* Status Online */
+  .status-online { font-size: 11px; color: #16a34a; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .status-online span { display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
 
-  /* Legenda */
-  .tl-legend { display: flex; align-items: center; gap: 20px; padding: 12px 24px; background: #ffffff; border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #64748b; flex-wrap: wrap; }
-  .tl-item { display: flex; align-items: center; gap: 6px; }
-  .tl-line { width: 28px; height: 2px; border-radius: 2px; }
+  /* Sub-header com Monitoramento */
+  .sub-bar {
+    padding: 10px 24px; background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .live-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; font-weight: 600; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
 
   .panel { padding: 24px; }
   .sec-title { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; font-weight: 700; }
 
-  /* Kanban Board - Versão Clara */
+  /* Kanban Board */
   .kb-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: start; }
 
   .kb-col {
     background: #f1f5f9;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    min-height: 600px;
+    min-height: 70vh;
     display: flex;
     flex-direction: column;
   }
@@ -63,16 +63,17 @@
   .kb-col-header {
     padding: 16px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   .kb-count { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 11px; }
 
   .kb-cards-container { padding: 10px; flex-grow: 1; min-height: 100px; }
 
-  /* Cards Brancos */
   .kb-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
@@ -80,14 +81,15 @@
     padding: 16px;
     margin-bottom: 12px;
     cursor: grab;
-    transition: box-shadow 0.2s, border-color 0.2s;
+    transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
   }
-  .kb-card:hover { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-  .kb-card.dragging { opacity: 0.5; transform: scale(0.98); }
+  .kb-card:hover { border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .kb-card:active { cursor: grabbing; }
 
   .kb-machine { font-size: 10px; color: #94a3b8; margin-bottom: 6px; font-family: monospace; font-weight: 700; text-transform: uppercase; }
-  .kb-task { font-size: 13px; color: #334155; font-weight: 600; margin-bottom: 14px; line-height: 1.4; }
+  .kb-task { font-size: 13px; color: #334155; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+  .kb-part { font-size: 11px; color: #64748b; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px dashed #cbd5e1; margin-bottom: 12px; display: inline-block; width: 100%;}
 
   .kb-meta {
     display: flex;
@@ -97,7 +99,9 @@
     border-top: 1px solid #f1f5f9;
   }
   .kb-who { color: #64748b; }
-  .kb-due { color: #d97706; font-weight: 700; }
+  .kb-due { color: #475569; font-weight: 700; }
+
+  .priority-high { color: #ef4444; background: #fef2f2; padding: 2px 4px; border-radius: 4px; }
 
   @media(max-width:1100px) { .kb-board { grid-template-columns: repeat(2, 1fr); } }
   @media(max-width:650px) { .kb-board { grid-template-columns: 1fr; } }
@@ -106,54 +110,49 @@
 <body>
 
 <div id="topbar">
-  <div class="logo">
-    <div class="logo-icon">⚡</div>
-    <div><div class="logo-text">VibSense</div><div class="logo-sub">PREDICTIVE MAINTENANCE</div></div>
-  </div>
-
+  <div class="logo"><div class="logo-text">Teknikao</div></div>
   <ul class="tabs">
       <li><a href="{% url 'manutencao:visao_geral' %}" class="tab-link">Visão Geral</a></li>
       <li><a href="{% url 'manutencao:graficos' %}" class="tab-link">Gráficos</a></li>
       <li><a href="{% url 'manutencao:kanban' %}" class="tab-link active">Kanban</a></li>
       <li><a href="{% url 'manutencao:relatorio' %}" class="tab-link">Relatórios</a></li>
   </ul>
-
-  <div class="live-dot"><div class="dot"></div><span>Sistema Online</span></div>
+  <div class="status-online">
+    <span></span>SISTEMA ONLINE
+  </div>
 </div>
 
-<div class="tl-legend">
-  <div class="tl-item"><div class="tl-line" style="background:#3b82f6;"></div><span>Vibração real</span></div>
-  <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #94a3b8"></div><span>Projeção</span></div>
-  <div class="tl-item"><div class="tl-line" style="background:#f59e0b;"></div><span>Corte: 20/01/26</span></div>
+<div class="sub-bar">
+  <div class="live-dot"><div class="dot"></div><span>Monitoramento Ativo de Logística</span></div>
+  <div style="font-size: 11px; color: #64748b;">Quarta-feira, 25 de Março de 2026</div>
 </div>
 
 <div class="panel">
-  <div class="sec-title">Gestão de Manutenção / Kanban Interativo</div>
-  <div class="kb-board" id="kb-board">
-    </div>
+  <div class="sec-title">Fluxo de Aquisição e Substituição de Ativos</div>
+  <div class="kb-board" id="kb-board"></div>
 </div>
 
 <script>
 const COLUMNS = {
-  urgente:      { label:"Urgente",      color:"#dc2626", icon:"🔴" },
-  em_andamento: { label:"Em Andamento", color:"#d97706", icon:"🟡" },
-  agendado:      { label:"Agendado",      color:"#2563eb", icon:"🔵" },
-  concluido:    { label:"Concluído",    color:"#16a34a", icon:"✅" },
+  cotacao:     { label:"Cotação / Pendente", color:"#64748b", icon:"📝" },
+  compra:      { label:"Em Compra / Trânsito", color:"#2563eb", icon:"🚚" },
+  substituicao: { label:"Aguardando Troca",    color:"#d97706", icon:"🛠️" },
+  finalizado:  { label:"Manutenção Concluída", color:"#16a34a", icon:"✅" },
 };
 
 let KB_DATA = {
-  urgente:[
-    { id: 1, machine:"Compressor Alpha", task:"Orçamento: rolamento", due:"Fev/26", who:"Carlos M." },
-    { id: 2, machine:"Ventilador CV-07", task:"Orçamento: hélice", due:"Fev/26", who:"Ana R." },
+  cotacao:[
+    { id: 1, machine:"Exaustor Central E-04", task:"Troca Preventiva (Vibração Elevada)", part:"Rolamento SKF Explorer", due:"URGENTE", who:"Dept. Compras" },
+    { id: 2, machine:"Bomba Hidráulica B-02", task:"Vazamento detectado no selo", part:"Selo Mecânico Viton", due:"05 dias", who:"Eng. Manutenção" },
   ],
-  em_andamento:[
-    { id: 3, machine:"Motor Bomba B2", task:"Fornecedores lubrificante", due:"Mar/26", who:"Pedro L." },
+  compra:[
+    { id: 3, machine:"Compressor Parafuso CP-01", task:"Kit de filtros (3000h)", part:"Kit Manutenção Atlas Copco", due:"28/03", who:"Logística" },
   ],
-  agendado:[
-    { id: 5, machine:"Compressor Alpha", task:"Peças (Prazo 20/04)", due:"Abr/26", who:"Carlos M." },
+  substituicao:[
+    { id: 4, machine:"Motor Transportadora T-10", task:"Alinhamento e Troca de Polia", part:"Polia em V - Perfil B", due:"Sábado 08:00", who:"Téc. Roberto" },
   ],
-  concluido:[
-    { id: 7, machine:"Prensa H-12", task:"Troca fluido hidráulico", due:"Jan/26", who:"Marcos F." },
+  finalizado:[
+    { id: 5, machine:"Resfriador R-09", task:"Substituição de correias", part:"Conjunto Correias Gates", due:"24/03", who:"Téc. Carlos" },
   ],
 };
 
@@ -168,7 +167,7 @@ function renderBoard() {
     const colEl = document.createElement('div');
     colEl.className = 'kb-col';
     colEl.innerHTML = `
-      <div class="kb-col-header" style="color:${colCfg.color}">
+      <div class="kb-col-header" style="color:${colCfg.color}; border-bottom: 2px solid ${colCfg.color}20">
         <span>${colCfg.icon} ${colCfg.label}</span>
         <span class="kb-count">${cards.length}</span>
       </div>
@@ -181,12 +180,16 @@ function renderBoard() {
       const cardEl = document.createElement('div');
       cardEl.className = 'kb-card';
       cardEl.draggable = true;
+
+      const isUrgent = card.due.toLowerCase().includes('urgente');
+
       cardEl.innerHTML = `
         <div class="kb-machine">${card.machine}</div>
         <div class="kb-task">${card.task}</div>
+        <div class="kb-part">📦 ${card.part}</div>
         <div class="kb-meta">
           <span class="kb-who">👤 ${card.who}</span>
-          <span class="kb-due">${card.due}</span>
+          <span class="kb-due ${isUrgent ? 'priority-high' : ''}">${card.due}</span>
         </div>
       `;
 
