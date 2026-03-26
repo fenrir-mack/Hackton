@@ -155,12 +155,12 @@
 
 <script>
 const MACHINES = [
-  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", nextMaint:"08/08/2026", growth:"+62%", allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s", hidden: false },
-  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", nextMaint:"12/08/2026", growth:"+55%", allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s", hidden: false },
-  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", nextMaint:"15/09/2026", growth:"+41%", allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s", hidden: false },
-  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", nextMaint:"10/11/2026", growth:"+18%", allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s", hidden: false },
-  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", nextMaint:"22/11/2026", growth:"+15%", allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s", hidden: false },
-  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", nextMaint:"05/01/2027", growth:"+2%", allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s", hidden: false },
+  { id:"M-01", name:"01- ESPAJIDOR DA CALDEIRA 1", sector:"01H ENT MOTOR", trend:"critical", nextMaint:"08/08/2026", growth:"+62%", allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s", hidden: false },
+  { id:"M-05", name:"04- AGUA TRAt LIMP  FILTROS", sector:"1H ENT MOTOR", trend:"critical", nextMaint:"12/08/2026", growth:"+55%", allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s", hidden: false },
+  { id:"M-02", name:"05- CENTRIFUGA DE LEVEDO N°5", sector:"1H ENT MOTOR", trend:"warning", nextMaint:"15/09/2026", growth:"+41%", allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s", hidden: false },
+  { id:"M-03", name:"12- EXA TORRE REFRIG Nº5", sector:"01H - ENT MOTOR", trend:"watch", nextMaint:"10/11/2026", growth:"+18%", allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s", hidden: false },
+  { id:"M-06", name:"05- CENTRIFUGA DE LEVEDO N°5", sector:"6H-EIXO VER INF", trend:"watch", nextMaint:"22/11/2026", growth:"+15%", allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s", hidden: false },
+  { id:"M-04", name:"14- EXAUSTOR TORRE CHILLER", sector:"3H - ENT RED LA", trend:"stable", nextMaint:"05/01/2027", growth:"+2%", allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s", hidden: false },
 ];
 
 const TREND = {

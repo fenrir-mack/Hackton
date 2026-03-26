@@ -135,17 +135,17 @@ const COLUMNS = {
 
 let KB_DATA = {
   cotacao:[
-    { id: 1, machine:"Exaustor Central E-04", task:"Troca Preventiva (Vibração Elevada)", part:"Rolamento SKF Explorer", due:"URGENTE", who:"Dept. Compras" },
-    { id: 2, machine:"Bomba Hidráulica B-02", task:"Vazamento detectado no selo", part:"Selo Mecânico Viton", due:"05 dias", who:"Eng. Manutenção" },
+    { id: 1, machine:"02H SAID MOTOR", task:"01- ESPAJIDOR DA CALDEIRA 1", part:"Rolamento SKF Explorer", due:"05/08", who:"Dept. Compras" },
+    { id: 2, machine:"2V SAI MOTOR", task:"03- AGUA A TRATAR Nº 3", part:"Selo Mecânico Viton", due:"28/07", who:"Eng. Manutenção" },
   ],
   compra:[
-    { id: 3, machine:"Compressor Parafuso CP-01", task:"Kit de filtros (3000h)", part:"Kit Manutenção Atlas Copco", due:"28/03", who:"Logística" },
+    { id: 3, machine:"4V - MANCAL LOA", task:"09- VEN Nº1 ADIAB MASSA A (L.SEC)", part:"Kit Manutenção Atlas Copco", due:"12/05", who:"Logística" },
   ],
   substituicao:[
-    { id: 4, machine:"Motor Transportadora T-10", task:"Alinhamento e Troca de Polia", part:"Polia em V - Perfil B", due:"Sábado 08:00", who:"Téc. Roberto" },
+    { id: 4, machine:"4V - MANCAL LOA", task:"11- EXAUSTOR DAS KONTS", part:"Polia em V - Perfil B", due:"20 dias", who:"Téc. Roberto" },
   ],
   finalizado:[
-    { id: 5, machine:"Resfriador R-09", task:"Substituição de correias", part:"Conjunto Correias Gates", due:"24/03", who:"Téc. Carlos" },
+    { id: 5, machine:"RED - PAINEL NK400", task:"13- EXAUSTOR TORRE RESFR EVAP N1 - L.FAAÇ", part:"Conjunto Correias Gates", due:"URGENTE", who:"Téc. Carlos" },
   ],
 };
 
@@ -181,7 +181,6 @@ function renderBoard() {
         <div class="kb-task">${card.task}</div>
         <div class="kb-part">Peça: ${card.part}</div>
         <div class="kb-meta">
-          <span class="kb-who">Resp: ${card.who}</span>
           <span class="kb-due ${isUrgent ? 'priority-high' : ''}">${card.due}</span>
         </div>
       `;
