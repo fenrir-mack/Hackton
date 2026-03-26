@@ -104,90 +104,95 @@ def processar():
             continue
 
         print(f"\n📂 Sala: {sala}")
-        print(f"Conteúdo: {os.listdir(caminho_sala)}")
 
-        for subsala in os.listdir(caminho_sala):
-            caminho_subsala = os.path.join(caminho_sala, subsala)
+        # percorre tudo dentro da sala
+        for root, dirs, files in os.walk(caminho_sala):
 
-            if not os.path.isdir(caminho_subsala):
+            # 🔥 detecta configuração (onde existe HST9)
+            hst9_files = [f for f in files if f.endswith(".HST9")]
+
+            if not hst9_files:
                 continue
 
-            print(f"\n📁 SubSala: {subsala}")
+            config_path = root
+            config = os.path.basename(config_path)
 
-            for motor in os.listdir(caminho_subsala):
-                caminho_motor = os.path.join(caminho_subsala, motor)
+            # sobe níveis
+            partes = config_path.replace(caminho_sala, "").strip(os.sep).split(os.sep)
 
-                if not os.path.isdir(caminho_motor):
+            # 🧠 interpretação dinâmica
+            if len(partes) == 2:
+                # SALA/MOTOR/CONFIG
+                sub_sala = None
+                motor = partes[0]
+
+            elif len(partes) >= 3:
+                # SALA/SUBSALA/MOTOR/CONFIG
+                sub_sala = partes[0]
+                motor = partes[1]
+
+            else:
+                print(f"⚠️ Estrutura desconhecida: {config_path}")
+                continue
+
+            print(f"\n📊 CONFIG ENCONTRADA")
+            print(f"SubSala: {sub_sala}")
+            print(f"Motor: {motor}")
+            print(f"Config: {config}")
+
+            # 🔍 extrai HST9
+            nivel1, nivel2 = extrair_hst9(config_path)
+
+            if nivel1 is None:
+                continue
+
+            # 📄 arquivos SDAV8
+            for arquivo in files:
+                if not arquivo.endswith(".SDAV8"):
                     continue
 
-                print(f"⚙️ Motor: {motor}")
+                caminho_arquivo = os.path.join(config_path, arquivo)
 
-                for config in os.listdir(caminho_motor):
-                    caminho_config = os.path.join(caminho_motor, config)
+                data, rms = extrair_dados_arquivo(caminho_arquivo)
 
-                    if not os.path.isdir(caminho_config):
-                        continue
+                if not data or not rms:
+                    continue
 
-                    print(f"📊 Config: {config}")
+                data_convertida = converter_data(data)
 
-                    nivel1, nivel2 = extrair_hst9(caminho_config)
+                if not data_convertida:
+                    continue
 
-                    if nivel1 is None:
-                        continue
+                try:
+                    data_float = float(data.replace(",", "."))
+                except:
+                    data_float = None
 
-                    print("✅ HST9 válido")
+                try:
+                    rms_val = float(rms.replace(",", "."))
+                except:
+                    continue
 
-                    for arquivo in os.listdir(caminho_config):
-                        if not arquivo.endswith(".SDAV8"):
-                            continue
+                registro = {
+                    "usina": os.path.basename(BASE_PATH),
+                    "sala": sala,
+                    "sub_sala": sub_sala,
+                    "motor": motor,
+                    "configuracao": config,
+                    "arquivo": arquivo,
+                    "data_arquivo": data_float,
+                    "data_convertida": data_convertida,
+                    "rms": rms_val,
+                    "nivel1": nivel1,
+                    "nivel2": nivel2
+                }
 
-                        caminho_arquivo = os.path.join(caminho_config, arquivo)
+                print(f"💾 {registro}")
 
-                        print(f"📄 Lendo: {arquivo}")
-
-                        data, rms = extrair_dados_arquivo(caminho_arquivo)
-
-                        if not data or not rms:
-                            print("⚠️ Sem data ou RMS")
-                            continue
-
-                        data_convertida = converter_data(data)
-
-                        if not data_convertida:
-                            continue
-
-                        try:
-                            data_float = float(data.replace(",", "."))
-                        except:
-                            data_float = None
-
-                        try:
-                            rms_val = float(rms.replace(",", "."))
-                        except:
-                            print("❌ RMS inválido")
-                            continue
-
-                        registro = {
-                            "usina": os.path.basename(BASE_PATH),
-                            "sala": sala,
-                            "sub_sala": subsala,
-                            "motor": motor,
-                            "configuracao": config,
-                            "arquivo": arquivo,
-                            "data_arquivo": data_float,
-                            "data_convertida": data_convertida,
-                            "rms": rms_val,
-                            "nivel1": nivel1,
-                            "nivel2": nivel2
-                        }
-
-                        print(f"💾 Preparado: {registro}")
-
-                        resultados.append(registro)
+                resultados.append(registro)
 
     print(f"\n🎯 TOTAL COLETADO: {len(resultados)}")
     return resultados
-
 
 # ========================
 # EXECUÇÃO
@@ -200,27 +205,33 @@ dados = processar()
 # ========================
 from manutencao.models import Medicao
 
-print("\n💾 Salvando no banco...")
+print("\n💾 Salvando em lote...")
+
+objetos = []
 
 for d in dados:
-    try:
-        Medicao.objects.create(
-            usina=d["usina"],
-            sala=d["sala"],
-            sub_sala=d["sub_sala"],
-            motor=d["motor"],
-            configuracao=d["configuracao"],
-            arquivo=d["arquivo"],
-            data_arquivo=d["data_arquivo"],
-            data_convertida=d["data_convertida"],
-            rms=d["rms"],
-            nivel1=d["nivel1"],
-            nivel2=d["nivel2"]
-        )
+    objetos.append(Medicao(
+        usina=d["usina"],
+        sala=d["sala"],
+        sub_sala=d["sub_sala"],
+        motor=d["motor"],
+        configuracao=d["configuracao"],
+        arquivo=d["arquivo"],
+        data_arquivo=d["data_arquivo"],
+        data_convertida=d["data_convertida"],
+        rms=d["rms"],
+        nivel1=d["nivel1"],
+        nivel2=d["nivel2"]
+    ))
 
-        print("✅ Salvo no banco")
+# 🔥 salva de 5k em 5k (evita estourar memória)
+BATCH_SIZE = 5000
 
-    except Exception as e:
-        print(f"❌ Erro ao salvar: {e}")
+for i in range(0, len(objetos), BATCH_SIZE):
+    lote = objetos[i:i + BATCH_SIZE]
+
+    Medicao.objects.bulk_create(lote, batch_size=BATCH_SIZE)
+
+    print(f"✅ Salvo lote {i} até {i + len(lote)}")
 
 print("🏁 FINALIZADO")
