@@ -27,6 +27,21 @@
   .tab-link:hover { color: #0f172a; background: #f1f5f9; }
   .tab-link.active { color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; font-weight: 700; }
 
+  /* Novo Botão Atualizar na Topbar */
+  .btn-refresh {
+    padding: 8px 16px; background: #ffffff; border: 1px solid #e2e8f0;
+    border-radius: 8px; color: #475569; font-size: 12px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-refresh:hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+
+  .spinner { width: 14px; height: 14px; border: 2px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; display: none; }
+  .btn-refresh.loading .spinner { display: block; animation: spin 0.8s linear infinite; }
+  .btn-refresh.loading .icon-static { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   /* Filtros e Botões */
   .sidebar-controls { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 
@@ -36,7 +51,6 @@
   }
   .btn-filter:hover { background: #f8fafc; border-color: #cbd5e1; }
 
-  /* Bandeja de Filtros (Dropdown) */
   .filter-tray {
     position: absolute; top: 35px; right: 0; width: 200px; background: white;
     border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;
@@ -46,22 +60,11 @@
   .filter-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 11px; font-weight: 600; color: #475569; }
   .filter-item:last-child { margin-bottom: 0; padding-top: 8px; border-top: 1px solid #f1f5f9; }
 
-  /* Toggle Switch Minimalista */
   .tgl { position: relative; width: 30px; height: 16px; background: #e2e8f0; border-radius: 20px; cursor: pointer; transition: 0.3s; }
   .tgl::after { content: ''; position: absolute; width: 12px; height: 12px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
   input:checked + .tgl { background: #3b82f6; }
   input:checked + .tgl::after { left: 16px; }
   .filter-item input { display: none; }
-
-  /* Restante do Layout */
-  .btn-refresh {
-    width: 100%; padding: 10px; margin-bottom: 16px; background: #ffffff; border: 1px solid #e2e8f0;
-    border-radius: 8px; color: #475569; font-size: 12px; font-weight: 700; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .spinner { width: 14px; height: 14px; border: 2px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; display: none; }
-  .btn-refresh.loading .spinner { display: block; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
 
   #alert-bar { background: #fef2f2; border-bottom: 1px solid #fee2e2; padding: 10px 24px; font-size: 12px; color: #991b1b; display: flex; align-items: center; gap: 8px; }
   .panel { padding: 24px; }
@@ -99,10 +102,12 @@
       <li><a href="{% url 'manutencao:kanban' %}" class="tab-link">Kanban</a></li>
       <li><a href="{% url 'manutencao:relatorio' %}" class="tab-link">Relatórios</a></li>
   </ul>
-  <div style="font-size: 11px; color: #16a34a; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-    <span style="display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
-    SISTEMA ONLINE
-  </div>
+
+  <button class="btn-refresh" id="btn-refresh" onclick="triggerRefresh()">
+    <span class="spinner"></span>
+    <span class="icon-static">🔄</span>
+    <span id="btn-text">Atualizar Dados</span>
+  </button>
 </div>
 
 <div id="alert-bar">
@@ -113,12 +118,6 @@
 <div class="panel">
   <div id="ov-layout">
     <div class="sidebar-container">
-      <button class="btn-refresh" id="btn-refresh" onclick="triggerRefresh()">
-        <span class="spinner"></span>
-        <span class="icon-static">🔄</span>
-        <span id="btn-text">Atualizar Dados</span>
-      </button>
-
       <div class="sidebar-controls">
         <div class="sec-title" style="margin-bottom:0">Ativos Industriais</div>
         <button class="btn-filter" onclick="toggleTray()">
@@ -183,7 +182,6 @@ function toggleTray() {
   document.getElementById('filter-tray').classList.toggle('active');
 }
 
-// Fecha a bandeja ao clicar fora
 window.onclick = function(event) {
   if (!event.target.closest('.sidebar-controls')) {
     document.getElementById('filter-tray').classList.remove('active');
@@ -212,8 +210,6 @@ function renderList() {
   const list = document.getElementById('prio-list');
   const showHidden = document.getElementById('show-hidden-toggle').checked;
   const searchTerm = document.getElementById('machine-search').value.toLowerCase();
-
-  // Pega quais status estão ativos nos filtros
   const activeStatus = Array.from(document.querySelectorAll('[data-filter]:checked')).map(el => el.dataset.filter);
 
   list.innerHTML = '';

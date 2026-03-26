@@ -52,7 +52,10 @@
 
   .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; margin-bottom: 16px; }
   .kpi-box { background: #fff; padding: 20px; text-align: center; }
-  .kpi-val { font-size: 24px; font-weight: 900; display: block; }
+
+  /* Números em negrito e sem cores específicas */
+  .kpi-val { font-size: 24px; font-weight: 900; display: block; color: #1e293b; }
+
   .kpi-lbl { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-top: 4px; }
 
   /* Tabela Técnica */
@@ -113,15 +116,15 @@
     </div>
     <div style="text-align:right">
       <div class="report-meta">Severidade Global</div>
-      <div style="color:#dc2626; font-weight:900; font-size:24px">ALTA CRITICIDADE</div>
+      <div style="color:#0f172a; font-weight:900; font-size:24px">ALTA CRITICIDADE</div>
     </div>
   </div>
 
   <div class="grid4">
-    <div class="kpi-box"><span class="kpi-val" style="color:#dc2626" id="kpi-crit">0</span><span class="kpi-lbl">Críticos</span></div>
-    <div class="kpi-box"><span class="kpi-val" style="color:#d97706" id="kpi-warn">0</span><span class="kpi-lbl">Em Alerta</span></div>
-    <div class="kpi-box"><span class="kpi-val" style="color:#2563eb" id="kpi-watch">0</span><span class="kpi-lbl">Observação</span></div>
-    <div class="kpi-box"><span class="kpi-val" style="color:#16a34a" id="kpi-stable">0</span><span class="kpi-lbl">Estáveis</span></div>
+    <div class="kpi-box"><span class="kpi-val" id="kpi-crit">0</span><span class="kpi-lbl">Críticos</span></div>
+    <div class="kpi-box"><span class="kpi-val" id="kpi-warn">0</span><span class="kpi-lbl">Em Alerta</span></div>
+    <div class="kpi-box"><span class="kpi-val" id="kpi-watch">0</span><span class="kpi-lbl">Observação</span></div>
+    <div class="kpi-box"><span class="kpi-val" id="kpi-stable">0</span><span class="kpi-lbl">Estáveis</span></div>
   </div>
 
   <div class="card">
@@ -185,8 +188,8 @@ function renderReport() {
       <td style="font-family:monospace; font-weight:700">${m.id}</td>
       <td><strong>${m.name}</strong></td>
       <td>${m.sector}</td>
-      <td>${m.curVib.toFixed(2)} ${m.unit}</td>
-      <td><span style="color:${pct > 80 ? '#dc2626' : '#64748b'}; font-weight: 700">${pct}%</span></td>
+      <td><strong>${m.curVib.toFixed(2)} ${m.unit}</strong></td>
+      <td><span style="font-weight: 900">${pct}%</span></td>
       <td>${m.nextMaint}</td>
       <td><span class="badge" style="color:${style.color}; border-color:${style.color}; background:${style.bg}">${style.label}</span></td>
     `;

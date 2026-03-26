@@ -15,7 +15,7 @@
     min-height: 100vh;
   }
 
-  /* Topbar Sincronizada */
+  /* Topbar */
   #topbar {
     position: sticky; top: 0; z-index: 200;
     background: #ffffff; border-bottom: 1px solid #e2e8f0;
@@ -32,11 +32,9 @@
   .tab-link:hover { color: #0f172a; background: #f1f5f9; }
   .tab-link.active { color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; font-weight: 700; }
 
-  /* Status Online */
   .status-online { font-size: 11px; color: #16a34a; font-weight: 700; display: flex; align-items: center; gap: 6px; }
   .status-online span { display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
 
-  /* Sub-header com Monitoramento */
   .sub-bar {
     padding: 10px 24px; background: #ffffff; border-bottom: 1px solid #e2e8f0;
     display: flex; align-items: center; justify-content: space-between;
@@ -58,7 +56,6 @@
     display: flex;
     flex-direction: column;
   }
-  .kb-col.drag-over { background: #e2e8f0; border-color: #cbd5e1; }
 
   .kb-col-header {
     padding: 16px;
@@ -69,6 +66,8 @@
     align-items: center;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    color: #475569; /* Cor Neutra */
+    border-bottom: 2px solid #e2e8f0;
   }
   .kb-count { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 11px; }
 
@@ -82,14 +81,12 @@
     margin-bottom: 12px;
     cursor: grab;
     transition: all 0.2s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
   }
-  .kb-card:hover { border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-  .kb-card:active { cursor: grabbing; }
+  .kb-card:hover { border-color: #cbd5e1; transform: translateY(-1px); }
 
   .kb-machine { font-size: 10px; color: #94a3b8; margin-bottom: 6px; font-family: monospace; font-weight: 700; text-transform: uppercase; }
   .kb-task { font-size: 13px; color: #334155; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
-  .kb-part { font-size: 11px; color: #64748b; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px dashed #cbd5e1; margin-bottom: 12px; display: inline-block; width: 100%;}
+  .kb-part { font-size: 11px; color: #64748b; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 12px; display: inline-block; width: 100%;}
 
   .kb-meta {
     display: flex;
@@ -134,10 +131,10 @@
 
 <script>
 const COLUMNS = {
-  cotacao:     { label:"Cotação / Pendente", color:"#64748b", icon:"📝" },
-  compra:      { label:"Em Compra / Trânsito", color:"#2563eb", icon:"🚚" },
-  substituicao: { label:"Aguardando Troca",    color:"#d97706", icon:"🛠️" },
-  finalizado:  { label:"Manutenção Concluída", color:"#16a34a", icon:"✅" },
+  cotacao:     { label:"Cotação / Pendente" },
+  compra:      { label:"Em Compra / Trânsito" },
+  substituicao: { label:"Aguardando Troca" },
+  finalizado:  { label:"Manutenção Concluída" },
 };
 
 let KB_DATA = {
@@ -167,8 +164,8 @@ function renderBoard() {
     const colEl = document.createElement('div');
     colEl.className = 'kb-col';
     colEl.innerHTML = `
-      <div class="kb-col-header" style="color:${colCfg.color}; border-bottom: 2px solid ${colCfg.color}20">
-        <span>${colCfg.icon} ${colCfg.label}</span>
+      <div class="kb-col-header">
+        <span>${colCfg.label}</span>
         <span class="kb-count">${cards.length}</span>
       </div>
       <div class="kb-cards-container" data-status="${colKey}"></div>
@@ -186,9 +183,9 @@ function renderBoard() {
       cardEl.innerHTML = `
         <div class="kb-machine">${card.machine}</div>
         <div class="kb-task">${card.task}</div>
-        <div class="kb-part">📦 ${card.part}</div>
+        <div class="kb-part">Peça: ${card.part}</div>
         <div class="kb-meta">
-          <span class="kb-who">👤 ${card.who}</span>
+          <span class="kb-who">Resp: ${card.who}</span>
           <span class="kb-due ${isUrgent ? 'priority-high' : ''}">${card.due}</span>
         </div>
       `;
