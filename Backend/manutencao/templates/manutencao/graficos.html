@@ -7,11 +7,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
-  /* Reset e Estilo Global */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #f8fafc; color: #1e293b; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
 
-  /* Topbar Sincronizada */
   #topbar {
     position: sticky; top: 0; z-index: 200;
     background: #ffffff; border-bottom: 1px solid #e2e8f0;
@@ -22,17 +20,12 @@
   .logo-text { font-weight: 900; font-size: 18px; color: #0f172a; letter-spacing: -0.5px; text-transform: uppercase; }
 
   .tabs { display: flex; gap: 4px; flex: 1; list-style: none; }
-  .tab-link {
-    text-decoration: none; color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 7px; transition: 0.2s;
-  }
-  .tab-link:hover { color: #0f172a; background: #f1f5f9; }
+  .tab-link { text-decoration: none; color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 7px; transition: 0.2s; }
   .tab-link.active { color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; font-weight: 700; }
 
-  /* Status Online */
   .status-online { font-size: 11px; color: #16a34a; font-weight: 700; display: flex; align-items: center; gap: 6px; }
   .status-online span { display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
 
-  /* Legend Bar & Controls */
   .control-bar {
     display: flex; justify-content: space-between; align-items: center;
     padding: 12px 24px; background: #ffffff; border-bottom: 1px solid #e2e8f0;
@@ -41,34 +34,11 @@
   .tl-item { display: flex; align-items: center; gap: 6px; }
   .tl-line { width: 24px; height: 2px; border-radius: 2px; }
 
-  /* Filtros (Bandeja) */
-  .filter-wrapper { position: relative; }
-  .btn-filter {
-    padding: 6px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px;
-    font-size: 11px; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 6px;
-  }
-  .filter-tray {
-    position: absolute; top: 35px; right: 0; width: 200px; background: white;
-    border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; display: none;
-  }
-  .filter-tray.active { display: block; }
-  .filter-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 11px; font-weight: 600; color: #475569; }
-
-  /* Toggle Switch */
-  .tgl { position: relative; width: 30px; height: 16px; background: #e2e8f0; border-radius: 20px; cursor: pointer; transition: 0.3s; }
-  .tgl::after { content: ''; position: absolute; width: 12px; height: 12px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
-  input:checked + .tgl { background: #3b82f6; }
-  input:checked + .tgl::after { left: 16px; }
-  .filter-item input { display: none; }
-
-  /* Grid e Cards */
   .panel { padding: 24px; }
   .sec-title { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .chart-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.3s; }
-  .chart-box.hidden { display: none; }
-  .chart-title { font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+  .chart-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .chart-title { font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
   .chart-sub { font-size: 11px; color: #64748b; margin-bottom: 16px; }
   .badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 5px; border: 1px solid; text-transform: uppercase; }
 
@@ -85,81 +55,77 @@
       <li><a href="{% url 'manutencao:kanban' %}" class="tab-link">Kanban</a></li>
       <li><a href="{% url 'manutencao:relatorio' %}" class="tab-link">Relatórios</a></li>
   </ul>
-  <div class="status-online">
-    <span></span>SISTEMA ONLINE
-  </div>
+  <div class="status-online"><span></span>SISTEMA ONLINE</div>
 </div>
 
 <div class="control-bar">
   <div class="tl-legend">
-    <div class="tl-item"><div class="tl-line" style="background:#3b82f6;"></div><span>Real</span></div>
-    <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #94a3b8"></div><span>Projeção</span></div>
-    <div class="tl-item"><div class="tl-line" style="background:#f59e0b;"></div><span>Data de Corte</span></div>
+    <div class="tl-item"><div class="tl-line" style="background:#3b82f6;"></div><span>Histórico (Picos/Vales)</span></div>
+    <div class="tl-item"><div class="tl-line" style="border-top:2px dashed #94a3b8"></div><span>Projeção Curta</span></div>
     <div class="tl-item"><div class="tl-line" style="background:#a855f7;"></div><span>Compra Peças</span></div>
-    <div class="tl-item"><div class="tl-line" style="background:#ef4444;"></div><span>Manutenção</span></div>
-  </div>
-
-  <div class="filter-wrapper">
-    <button class="btn-filter" onclick="toggleTray()">⚙️ Filtros de Status</button>
-    <div class="filter-tray" id="filter-tray">
-      <div class="filter-item"><span>🔴 Crítico</span> <label><input type="checkbox" checked onchange="applyFilters()" data-filter="critical"><div class="tgl"></div></label></div>
-      <div class="filter-item"><span>🟠 Alerta</span> <label><input type="checkbox" checked onchange="applyFilters()" data-filter="warning"><div class="tgl"></div></label></div>
-      <div class="filter-item"><span>🔵 Observar</span> <label><input type="checkbox" checked onchange="applyFilters()" data-filter="watch"><div class="tgl"></div></label></div>
-      <div class="filter-item"><span>🟢 Estável</span> <label><input type="checkbox" checked onchange="applyFilters()" data-filter="stable"><div class="tgl"></div></label></div>
-    </div>
+    <div class="tl-item"><div class="tl-line" style="background:#ef4444;"></div><span>Limite Crítico</span></div>
   </div>
 </div>
 
 <div class="panel">
-  <div class="sec-title">Histórico de Curvas e Projeção P-F (Dados até 20/01/2026)</div>
+  <div class="sec-title">Projeção de Curto Prazo (P-F) - Colisão Iminente</div>
   <div class="grid2" id="curves-grid"></div>
 </div>
 
 <script>
 const LABELS = ["Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26","Ago/26"];
-const IDX_CUTOFF = 6;
+const IDX_CUTOFF = 6; // Janeiro
+const IDX_COLLISION = 9; // Abril (Colisão acontece mais perto agora)
+
+function applySpikyNoise(arr) {
+    return arr.map((val, i) => {
+        const spike = (i % 2 === 0) ? 1.28 : 0.82;
+        const randomExtra = 1 + (Math.random() - 0.5) * 0.1;
+        return val * spike * randomExtra;
+    });
+}
 
 const MACHINES = [
-  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s" },
-  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s" },
-  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s" },
-  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s" },
-  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s" },
-  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s" },
+  { id:"M-01", name:"Compressor Alpha", trend:"critical", baseVib:[1.5, 2.0, 3.2, 4.2, 5.5, 6.8, 8.2], limit:12.0 },
+  { id:"M-05", name:"Ventilador CV-07", trend:"critical", baseVib:[1.0, 1.8, 2.5, 3.5, 4.5, 5.5, 6.5], limit:10.0 },
+  { id:"M-02", name:"Motor Bomba B2", trend:"warning", baseVib:[0.7, 1.0, 1.4, 1.8, 2.2, 2.8, 3.2], limit:6.0 },
+  { id:"M-03", name:"Torno CNC 3", trend:"watch", baseVib:[0.4, 0.5, 0.6, 0.75, 0.9, 1.0, 1.2], limit:2.5 },
 ];
 
 const TREND = {
   critical:{ label:"CRÍTICO", color:"#dc2626", bg:"#fef2f2", text:"#991b1b" },
   warning: { label:"ALERTA", color:"#d97706", bg:"#fffbeb", text:"#92400e" },
   watch:   { label:"OBSERVAR", color:"#2563eb", bg:"#eff6ff", text:"#1e40af" },
-  stable:  { label:"ESTÁVEL", color:"#16a34a", bg:"#f0fdf4", text:"#166534" },
 };
-
-function toggleTray() { document.getElementById('filter-tray').classList.toggle('active'); }
-
-window.onclick = (e) => {
-  if (!e.target.closest('.filter-wrapper')) document.getElementById('filter-tray').classList.remove('active');
-};
-
-function applyFilters() {
-  const activeStatus = Array.from(document.querySelectorAll('[data-filter]:checked')).map(el => el.dataset.filter);
-  MACHINES.forEach(m => {
-    const card = document.getElementById(`card-${m.id}`);
-    if (activeStatus.includes(m.trend)) card.classList.remove('hidden');
-    else card.classList.add('hidden');
-  });
-}
 
 function buildCurvesGrid() {
   const grid = document.getElementById('curves-grid');
   MACHINES.forEach(m => {
     const t = TREND[m.trend];
+
+    // Histórico Real
+    const historicalData = applySpikyNoise(m.baseVib);
+    const lastHistValue = historicalData[IDX_CUTOFF];
+
+    // Projeção Curta (batendo no limite em ABRIL)
+    const stepsToCollision = IDX_COLLISION - IDX_CUTOFF;
+    const increment = (m.limit - lastHistValue) / stepsToCollision;
+
+    const projectionData = LABELS.map((_, i) => {
+        if (i < IDX_CUTOFF) return null;
+        if (i === IDX_CUTOFF) return lastHistValue;
+        // Desenha até o ponto de colisão, depois para ou mantém
+        if (i <= IDX_COLLISION) {
+            return lastHistValue + (increment * (i - IDX_CUTOFF));
+        }
+        return null; // Remove a linha após a colisão para foco total no impacto
+    });
+
     const box = document.createElement('div');
     box.className = 'chart-box';
-    box.id = `card-${m.id}`;
     box.innerHTML = `
       <div class="chart-title"><span>${m.name}</span> <span class="badge" style="color:${t.text};border-color:${t.color};background:${t.bg}">${t.label}</span></div>
-      <div class="chart-sub">${m.id} · ${m.sector} · Limite: ${m.limit} ${m.unit}</div>
+      <div class="chart-sub">${m.id} · Falha prevista em: ${LABELS[IDX_COLLISION]}</div>
       <canvas id="curve-${m.id}" height="180"></canvas>
     `;
     grid.appendChild(box);
@@ -170,18 +136,49 @@ function buildCurvesGrid() {
       data: {
         labels: LABELS,
         datasets: [
-          { label:'Real', data:m.allVib.map((v,i)=>i<=IDX_CUTOFF?v:null), borderColor:t.color, backgroundColor:t.color+'15', borderWidth:2.5, fill:true, tension:.35 },
-          { label:'Projeção', data:m.allVib.map((v,i)=>i>=IDX_CUTOFF?v:null), borderColor:'#94a3b8', borderWidth:2, borderDash:[6,4], tension:.35 },
-          { label:'Limite', data:LABELS.map(()=>m.limit), borderColor:'#ef444444', borderWidth:1, borderDash:[3,3], pointRadius:0 }
+          {
+            label:'Real',
+            data: LABELS.map((_, i) => i <= IDX_CUTOFF ? historicalData[i] : null),
+            borderColor: t.color,
+            backgroundColor: t.color+'15',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.2
+          },
+          {
+            label:'Projeção',
+            data: projectionData,
+            borderColor: '#64748b',
+            borderWidth: 2,
+            borderDash: [5,3],
+            pointRadius: (c) => c.dataIndex === IDX_COLLISION ? 6 : 0,
+            pointBackgroundColor: '#ef4444',
+            tension: 0
+          }
         ]
       },
       options: {
-        plugins: { legend: { display: false }, annotation: { annotations: {
-          cutoff: { type:'line', scaleID:'x', value:"Jan/26", borderColor:'#f59e0b', borderWidth:2 },
-          buy: { type:'line', scaleID:'x', value:"Abr/26", borderColor:'#a855f7', borderWidth:2, borderDash:[5,5] },
-          maint: { type:'line', scaleID:'x', value:"Ago/26", borderColor:'#ef4444', borderWidth:2, borderDash:[5,5] }
-        }}},
-        scales: { y: { suggestedMax: m.limit * 1.2, ticks: { font: { size: 9 } } }, x: { ticks: { font: { size: 9 } } } }
+        plugins: {
+            legend: { display: false },
+            annotation: {
+                annotations: {
+                    buyLine: {
+                        type: 'line', yMin: m.limit * 0.75, yMax: m.limit * 0.75,
+                        borderColor: '#a855f7', borderWidth: 2, borderDash: [4, 4],
+                        label: { display: true, content: 'COMPRA', position: 'start', font: {size: 8}, backgroundColor: '#a855f7' }
+                    },
+                    limitLine: {
+                        type: 'line', yMin: m.limit, yMax: m.limit,
+                        borderColor: '#ef4444', borderWidth: 2,
+                        label: { display: true, content: 'LIMITE', position: 'start', font: {size: 8}, backgroundColor: '#ef4444' }
+                    }
+                }
+            }
+        },
+        scales: {
+            y: { beginAtZero: true, suggestedMax: m.limit * 1.3 },
+            x: { ticks: { font: { size: 9 } } }
+        }
       }
     });
   });
