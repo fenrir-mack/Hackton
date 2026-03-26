@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VibSense – Visão Geral</title>
+<title>TEKNIKAO – Visão Geral</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
@@ -17,84 +17,74 @@
     display: flex; align-items: center; padding: 0 24px; height: 56px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
-  .logo { display: flex; align-items: center; gap: 10px; margin-right: 32px; }
-  .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#f59e0b,#ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; }
-  .logo-text { font-weight: 800; font-size: 15px; color: #0f172a; }
-  .logo-sub  { font-size: 9px; color: #64748b; letter-spacing: 2px; }
+  .logo { display: flex; align-items: center; margin-right: 40px; }
+  .logo-text { font-weight: 900; font-size: 18px; color: #0f172a; letter-spacing: -0.5px; text-transform: uppercase; }
 
   .tabs { display: flex; gap: 4px; flex: 1; list-style: none; }
   .tab-link {
     text-decoration: none; color: #64748b; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 7px; transition: 0.2s;
   }
   .tab-link:hover { color: #0f172a; background: #f1f5f9; }
-  .tab-link.active { color: #f59e0b; background: #fffbeb; border: 1px solid #fef3c7; font-weight: 700; }
+  .tab-link.active { color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; font-weight: 700; }
 
-  /* Controls Above Search */
-  .sidebar-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .toggle-container { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; color: #64748b; cursor: pointer; }
-  .toggle-switch { position: relative; width: 34px; height: 18px; background: #e2e8f0; border-radius: 20px; transition: 0.3s; }
-  .toggle-switch::after { content: ''; position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
-  #show-hidden:checked + .toggle-switch { background: #3b82f6; }
-  #show-hidden:checked + .toggle-switch::after { left: 18px; }
-  #show-hidden { display: none; }
+  /* Filtros e Botões */
+  .sidebar-controls { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 
-  /* Alert Bar */
+  .btn-filter {
+    padding: 6px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px;
+    font-size: 11px; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-filter:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+  /* Bandeja de Filtros (Dropdown) */
+  .filter-tray {
+    position: absolute; top: 35px; right: 0; width: 200px; background: white;
+    border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; display: none;
+  }
+  .filter-tray.active { display: block; }
+  .filter-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 11px; font-weight: 600; color: #475569; }
+  .filter-item:last-child { margin-bottom: 0; padding-top: 8px; border-top: 1px solid #f1f5f9; }
+
+  /* Toggle Switch Minimalista */
+  .tgl { position: relative; width: 30px; height: 16px; background: #e2e8f0; border-radius: 20px; cursor: pointer; transition: 0.3s; }
+  .tgl::after { content: ''; position: absolute; width: 12px; height: 12px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s; }
+  input:checked + .tgl { background: #3b82f6; }
+  input:checked + .tgl::after { left: 16px; }
+  .filter-item input { display: none; }
+
+  /* Restante do Layout */
+  .btn-refresh {
+    width: 100%; padding: 10px; margin-bottom: 16px; background: #ffffff; border: 1px solid #e2e8f0;
+    border-radius: 8px; color: #475569; font-size: 12px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .spinner { width: 14px; height: 14px; border: 2px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; display: none; }
+  .btn-refresh.loading .spinner { display: block; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   #alert-bar { background: #fef2f2; border-bottom: 1px solid #fee2e2; padding: 10px 24px; font-size: 12px; color: #991b1b; display: flex; align-items: center; gap: 8px; }
-  #alert-bar .nms { font-weight: 700; color: #dc2626; }
-
   .panel { padding: 24px; }
   .sec-title { font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; }
-
-  /* Layout */
   #ov-layout { display: grid; grid-template-columns: 350px 1fr; gap: 24px; }
-
-  /* Sidebar */
   .sidebar-container { display: flex; flex-direction: column; gap: 12px; }
-  .search-box {
-    width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;
-    background: #fff; font-size: 13px; outline: none; transition: 0.2s;
-  }
-  .search-box:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+  .search-box { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; outline: none; margin-bottom: 4px; }
 
-  /* Card Esquerda */
-  .prio-row {
-    display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px;
-    border: 1px solid #e2e8f0; background: #ffffff; cursor: pointer; margin-bottom: 10px; transition: 0.2s;
-    position: relative;
-  }
-  .prio-row:hover { border-color: #cbd5e1; background: #f8fafc; }
-  .prio-row.selected { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08); background: #fff; }
-  .prio-row.is-hidden { opacity: 0.5; background: #f1f5f9; border-style: dashed; }
-
+  .prio-row { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; background: #ffffff; cursor: pointer; margin-bottom: 10px; position: relative; transition: 0.2s; }
+  .prio-row.selected { border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08); }
+  .prio-row.is-hidden { opacity: 0.4; background: #f1f5f9; border-style: dashed; }
   .prio-header { display: flex; justify-content: space-between; align-items: center; padding-right: 25px; }
-  .prio-name { font-weight: 700; font-size: 14px; color: #1e293b; }
-
-  .hide-btn {
-    position: absolute; right: 12px; top: 18px; background: none; border: none;
-    color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px; border-radius: 4px; transition: 0.2s;
-  }
-  .hide-btn:hover { color: #3b82f6; background: #eff6ff; }
-
+  .prio-name { font-weight: 700; font-size: 14px; }
+  .hide-btn { position: absolute; right: 12px; top: 18px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; }
   .badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 5px; border: 1px solid; text-transform: uppercase; }
   .prio-details { display: flex; justify-content: space-between; font-size: 11px; color: #64748b; }
-  .maint-date { font-weight: 600; color: #475569; }
 
-  /* Paginação e Outros */
-  .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 10px; padding: 10px 0; }
-  .pg-btn { border: 1px solid #e2e8f0; background: #fff; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; color: #64748b; }
-  .pg-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-
-  .chart-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .chart-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
   .milestone-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
   .milestone { flex: 1; min-width: 140px; border-radius: 10px; padding: 12px; border: 1px solid #e2e8f0; background: #f8fafc; }
-  .ms-label { font-size: 9px; color: #94a3b8; font-weight: 700; }
-  .ms-date { font-size: 16px; font-weight: 800; margin: 2px 0; }
-  .ms-desc { font-size: 11px; color: #64748b; }
-
   .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
   .card-kpi { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; }
   .kpi-val { font-size: 28px; font-weight: 900; }
-  .kpi-lbl { font-size: 10px; color: #94a3b8; font-weight: 700; margin-top: 4px; }
 
   @media(max-width:1100px) { #ov-layout { grid-template-columns: 1fr; } }
 </style>
@@ -102,37 +92,49 @@
 <body>
 
 <div id="topbar">
-  <div class="logo">
-    <div class="logo-icon">⚡</div>
-    <div><div class="logo-text">VibSense</div><div class="logo-sub">PREDICTIVE MAINTENANCE</div></div>
-  </div>
+  <div class="logo"><div class="logo-text">Teknikao</div></div>
   <ul class="tabs">
       <li><a href="{% url 'manutencao:visao_geral' %}" class="tab-link active">Visão Geral</a></li>
       <li><a href="{% url 'manutencao:graficos' %}" class="tab-link">Gráficos</a></li>
       <li><a href="{% url 'manutencao:kanban' %}" class="tab-link">Kanban</a></li>
       <li><a href="{% url 'manutencao:relatorio' %}" class="tab-link">Relatórios</a></li>
   </ul>
-  <div style="font-size: 12px; color: #16a34a; font-weight: 600;">● Sistema Online</div>
+  <div style="font-size: 11px; color: #16a34a; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+    <span style="display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
+    SISTEMA ONLINE
+  </div>
 </div>
 
 <div id="alert-bar">
   <span>⚠</span>
-  <span>Compra de peças recomendada para <span class="nms">20/04/2026</span> — Compressor Alpha · Ventilador CV-07</span>
+  <span>Compra de peças recomendada para <span class="nms">20/04/2026</span> — Compressor Alpha</span>
 </div>
 
 <div class="panel">
   <div id="ov-layout">
     <div class="sidebar-container">
+      <button class="btn-refresh" id="btn-refresh" onclick="triggerRefresh()">
+        <span class="spinner"></span>
+        <span class="icon-static">🔄</span>
+        <span id="btn-text">Atualizar Dados</span>
+      </button>
+
       <div class="sidebar-controls">
         <div class="sec-title" style="margin-bottom:0">Ativos Industriais</div>
-        <label class="toggle-container">
-          <span>Ver Ocultos</span>
-          <input type="checkbox" id="show-hidden" onchange="renderList()">
-          <div class="toggle-switch"></div>
-        </label>
+        <button class="btn-filter" onclick="toggleTray()">
+          <span>⚙️ Filtros</span>
+        </button>
+
+        <div class="filter-tray" id="filter-tray">
+          <div class="filter-item"><span>🔴 Crítico</span> <label><input type="checkbox" checked onchange="renderList()" data-filter="critical"><div class="tgl"></div></label></div>
+          <div class="filter-item"><span>🟠 Alerta</span> <label><input type="checkbox" checked onchange="renderList()" data-filter="warning"><div class="tgl"></div></label></div>
+          <div class="filter-item"><span>🔵 Observar</span> <label><input type="checkbox" checked onchange="renderList()" data-filter="watch"><div class="tgl"></div></label></div>
+          <div class="filter-item"><span>🟢 Estável</span> <label><input type="checkbox" checked onchange="renderList()" data-filter="stable"><div class="tgl"></div></label></div>
+          <div class="filter-item"><span>👁️ Ver Ocultos</span> <label><input type="checkbox" id="show-hidden-toggle" onchange="renderList()"><div class="tgl"></div></label></div>
+        </div>
       </div>
 
-      <input type="text" id="machine-search" class="search-box" placeholder="Pesquisar máquina ou setor...">
+      <input type="text" id="machine-search" class="search-box" placeholder="Pesquisar máquina...">
       <div id="prio-list"></div>
       <div class="pagination" id="pagination"></div>
     </div>
@@ -177,27 +179,49 @@ const itemsPerPage = 10;
 let detChart = null;
 let currentSelectedId = "M-01";
 
+function toggleTray() {
+  document.getElementById('filter-tray').classList.toggle('active');
+}
+
+// Fecha a bandeja ao clicar fora
+window.onclick = function(event) {
+  if (!event.target.closest('.sidebar-controls')) {
+    document.getElementById('filter-tray').classList.remove('active');
+  }
+}
+
+function triggerRefresh() {
+  const btn = document.getElementById('btn-refresh');
+  if (btn.classList.contains('loading')) return;
+  btn.classList.add('loading');
+  document.getElementById('btn-text').innerText = "Sincronizando...";
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    document.getElementById('btn-text').innerText = "Atualizar Dados";
+    renderList();
+  }, 1000);
+}
+
 function toggleHideMachine(e, id) {
   e.stopPropagation();
   const m = MACHINES.find(x => x.id === id);
-  if (m) {
-    m.hidden = !m.hidden;
-    renderList();
-  }
+  if (m) { m.hidden = !m.hidden; renderList(); }
 }
 
 function renderList() {
   const list = document.getElementById('prio-list');
-  const showHidden = document.getElementById('show-hidden').checked;
+  const showHidden = document.getElementById('show-hidden-toggle').checked;
   const searchTerm = document.getElementById('machine-search').value.toLowerCase();
 
-  list.innerHTML = '';
+  // Pega quais status estão ativos nos filtros
+  const activeStatus = Array.from(document.querySelectorAll('[data-filter]:checked')).map(el => el.dataset.filter);
 
-  // Filtragem baseada em busca, ocultos e toggle
+  list.innerHTML = '';
   const displayItems = MACHINES.filter(m => {
     const matchesSearch = m.name.toLowerCase().includes(searchTerm) || m.sector.toLowerCase().includes(searchTerm);
+    const matchesStatus = activeStatus.includes(m.trend);
     const shouldShowBasedOnHidden = showHidden ? true : !m.hidden;
-    return matchesSearch && shouldShowBasedOnHidden;
+    return matchesSearch && matchesStatus && shouldShowBasedOnHidden;
   });
 
   const start = (currentPage - 1) * itemsPerPage;
@@ -207,24 +231,17 @@ function renderList() {
     const t = TREND[m.trend];
     const row = document.createElement('div');
     row.className = `prio-row ${m.id === currentSelectedId ? 'selected' : ''} ${m.hidden ? 'is-hidden' : ''}`;
-
     row.innerHTML = `
-      <button class="hide-btn" onclick="toggleHideMachine(event, '${m.id}')" title="${m.hidden ? 'Reexibir' : 'Ocultar'}">
-        ${m.hidden ? '👁️‍🗨️' : '👁'}
-      </button>
+      <button class="hide-btn" onclick="toggleHideMachine(event, '${m.id}')">${m.hidden ? '👁️‍' : '👁️'}</button>
       <div class="prio-header">
         <div class="prio-name">${m.name}</div>
         <span class="badge" style="background:${t.bg}; color:${t.text}; border-color:${t.color}">${t.label}</span>
       </div>
-      <div class="prio-details">
-        <span>Setor: ${m.sector}</span>
-        <span class="maint-date">📅 ${m.nextMaint}</span>
-      </div>
+      <div class="prio-details"><span>Setor: ${m.sector}</span><span class="maint-date">📅 ${m.nextMaint}</span></div>
     `;
     row.onclick = () => selectMachine(m.id);
     list.appendChild(row);
   });
-
   renderPagination(displayItems.length);
 }
 
@@ -233,7 +250,6 @@ function renderPagination(totalCount) {
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   pag.innerHTML = '';
   if (totalPages <= 1) return;
-
   for (let i = 1; i <= totalPages; i++) {
     const btn = document.createElement('button');
     btn.className = `pg-btn ${i === currentPage ? 'active' : ''}`;
@@ -243,36 +259,27 @@ function renderPagination(totalCount) {
   }
 }
 
-document.getElementById('machine-search').oninput = () => {
-  currentPage = 1;
-  renderList();
-};
+document.getElementById('machine-search').oninput = () => { currentPage = 1; renderList(); };
 
 function selectMachine(id) {
   currentSelectedId = id;
   renderList();
-
   const m = MACHINES.find(x => x.id === id);
   const t = TREND[m.trend];
   const cur = m.allVib[6];
-
   document.getElementById('det-name').textContent = m.name;
   document.getElementById('det-sub').textContent = `${m.id} • ${m.sector} • Tendência ${m.growth}`;
-
   const b = document.getElementById('det-badge');
   b.textContent = t.label; b.style.color = t.text; b.style.background = t.bg; b.style.borderColor = t.color;
-
   document.getElementById('det-kpis').innerHTML = `
     <div class="card-kpi"><div class="kpi-val" style="color:${t.color}">${cur.toFixed(2)}</div><div class="kpi-lbl">${m.unit.toUpperCase()} ATUAL</div></div>
     <div class="card-kpi"><div class="kpi-val" style="color:#1e293b">${((cur/m.limit)*100).toFixed(0)}%</div><div class="kpi-lbl">DO LIMITE</div></div>
     <div class="card-kpi"><div class="kpi-val" style="color:#d97706">${m.growth}</div><div class="kpi-lbl">TENDÊNCIA 6M</div></div>
   `;
-
   document.getElementById('det-milestones').innerHTML = `
     <div class="milestone"> <div class="ms-label">COMPRAR PEÇAS</div> <div class="ms-date" style="color:#7c3aed">20/04/26</div> <div class="ms-desc">Aprovação pendente</div> </div>
     <div class="milestone"> <div class="ms-label">MANUTENÇÃO</div> <div class="ms-date" style="color:#dc2626">${m.nextMaint}</div> <div class="ms-desc">Parada prevista</div> </div>
   `;
-
   if (detChart) detChart.destroy();
   const ctx = document.getElementById('det-chart').getContext('2d');
   detChart = new Chart(ctx, {
@@ -288,7 +295,6 @@ function selectMachine(id) {
   });
 }
 
-// Iniciar
 renderList();
 selectMachine(MACHINES[0].id);
 </script>
