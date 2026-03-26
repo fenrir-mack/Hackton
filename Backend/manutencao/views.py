@@ -3,8 +3,7 @@ from collections import defaultdict
 from django.shortcuts import render
 from manutencao.models import Motor, Medicao, ResultadoMotor
 
-
-
+#para testar algum em especifico, tem que ter base de dados em C:Nome que quiser/Ausina
 def buscar_motor_por_path(path):
     partes = path.split('\\')
 
@@ -30,6 +29,7 @@ def buscar_motor_por_path(path):
         nome=motor_nome
     ).first()
 
+#algoritimo para limpar e ver se precisa ser calculado o valor
 def limpar_rms(lista, nivel1, resultado_motor):
     total = len(lista)
 
@@ -62,6 +62,7 @@ def limpar_rms(lista, nivel1, resultado_motor):
 
     return lista
 
+#se ja passou do por isso manutenção direto
 def verificar_limite2(lista, nivel2, resultado_motor):
     for p in lista:
         if p['rms'] >= nivel2:
