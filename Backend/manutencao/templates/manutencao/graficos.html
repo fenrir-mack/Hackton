@@ -113,72 +113,180 @@
 </div>
 
 <script>
-const LABELS = ["Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26","Jul/26","Ago/26"];
-const IDX_CUTOFF = 6;
+const LABELS = ["Jul/25","Ago/25","Set/25","Out/25","Nov/25","Dez/25","Jan/26","Fev/26","Mar/26"];
 
 const MACHINES = [
-  { id:"M-01", name:"Compressor Alpha", sector:"Linha A", trend:"critical", allVib:[0.8,1.1,1.6,2.2,3.0,4.1,5.5,6.9,8.2,9.2,9.8,10.2,10.6,10.9], limit:9.0, unit:"mm/s" },
-  { id:"M-05", name:"Ventilador CV-07", sector:"HVAC", trend:"critical", allVib:[0.6,0.85,1.2,1.65,2.2,3.0,4.0,5.0,5.8,6.5,6.9,7.15,7.3,7.42], limit:7.0, unit:"mm/s" },
-  { id:"M-02", name:"Motor Bomba B2", sector:"Linha B", trend:"warning", allVib:[0.5,0.6,0.72,0.88,1.05,1.25,1.5,1.75,2.0,2.3,2.6,2.88,3.1,3.35], limit:3.5, unit:"mm/s" },
-  { id:"M-03", name:"Torno CNC 3", sector:"Usinagem", trend:"watch", allVib:[0.30,0.33,0.36,0.40,0.44,0.49,0.55,0.60,0.66,0.72,0.78,0.85,0.92,1.00], limit:1.2, unit:"mm/s" },
-  { id:"M-06", name:"Prensa Hidráulica", sector:"Prensagem", trend:"watch", allVib:[0.40,0.43,0.46,0.50,0.54,0.59,0.65,0.71,0.77,0.83,0.90,0.97,1.04,1.12], limit:1.5, unit:"mm/s" },
-  { id:"M-04", name:"Extrusora Delta", sector:"Polímeros", trend:"stable", allVib:[1.10,1.11,1.12,1.11,1.13,1.12,1.14,1.15,1.16,1.17,1.18,1.19,1.20,1.21], limit:4.0, unit:"mm/s" },
+  {
+    id:"M-01",
+    name:"Compressor Alpha",
+    trend:"critical",
+    base:[0.8,4,1.9,5.8,4.3,4.5,7],
+    forecast:9.0,
+    limit:9.0,
+    warning:7,
+    failIndex:8
+  },
+  {
+    id:"M-05",
+    name:"Ventilador CV-07",
+    trend:"critical",
+    base:[0.6,1.1,0.9,2.2,2.0,3.8,5],
+    forecast:7.0,
+    limit:7.0,
+    warning:5.2,
+    failIndex:8 // ABRIL
+
+  },
+
+  {
+    id:"M-02",
+    name:"Motor Bomba B2",
+    trend:"warning",
+    base:[0.5,1.5,0.65,1.2,1.0,0.9,1.5],
+    forecast:3.5,
+    limit:3.5,
+    warning:2.5,
+    failIndex:11 // ABRIL
+
+  },
+  {
+    id:"M-03",
+    name:"Torno CNC 3",
+    trend:"watch",
+    base:[0.30,0.34,0.33,0.41,0.45,0.50,0.55],
+    forecast:1.2,
+    limit:1.2,
+    warning:0.9,
+    failIndex:20 // ABRIL
+
+  },
+
+  {
+    id:"M-06",
+    name:"Prensa Hidráulica",
+    trend:"watch",
+    base:[0.40,0.41,0.40,0.42,0.41,0.43,0.42],
+    forecast:1.5,
+    limit:1.5,
+    warning:1.2,
+  },
+  {
+    id:"M-04",
+    name:"Extrusora Delta",
+    trend:"stable",
+    base:[1.10,1.11,1.10,1.12,1.11,1.12,1.13],
+    forecast:4.0,
+    limit:4.0,
+    warning:3,
+
+  }
 ];
 
 const TREND = {
-  critical:{ label:"CRÍTICO", color:"#dc2626", bg:"#fef2f2", text:"#991b1b" },
-  warning: { label:"ALERTA", color:"#d97706", bg:"#fffbeb", text:"#92400e" },
-  watch:   { label:"OBSERVAR", color:"#2563eb", bg:"#eff6ff", text:"#1e40af" },
-  stable:  { label:"ESTÁVEL", color:"#16a34a", bg:"#f0fdf4", text:"#166534" },
+  critical:{ color:"#dc2626" },
+  warning: { color:"#d97706" },
+  watch:   { color:"#2563eb" },
+  stable:  { color:"#16a34a" }
 };
-
-function toggleTray() { document.getElementById('filter-tray').classList.toggle('active'); }
-
-window.onclick = (e) => {
-  if (!e.target.closest('.filter-wrapper')) document.getElementById('filter-tray').classList.remove('active');
-};
-
-function applyFilters() {
-  const activeStatus = Array.from(document.querySelectorAll('[data-filter]:checked')).map(el => el.dataset.filter);
-  MACHINES.forEach(m => {
-    const card = document.getElementById(`card-${m.id}`);
-    if (activeStatus.includes(m.trend)) card.classList.remove('hidden');
-    else card.classList.add('hidden');
-  });
-}
 
 function buildCurvesGrid() {
   const grid = document.getElementById('curves-grid');
+
   MACHINES.forEach(m => {
+
+  // 🔥 COLOCA AQUI
+  while (m.failIndex >= LABELS.length) {
+    let last = LABELS[LABELS.length - 1];
+    let [mes, ano] = last.split('/');
+
+    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+    let i = meses.indexOf(mes);
+
+    i++;
+    if (i >= 12) {
+      i = 0;
+      ano = String(parseInt(ano) + 1);
+    }
+
+    LABELS.push(meses[i] + "/" + ano);
+  }
+
+
     const t = TREND[m.trend];
+
     const box = document.createElement('div');
     box.className = 'chart-box';
-    box.id = `card-${m.id}`;
     box.innerHTML = `
-      <div class="chart-title"><span>${m.name}</span> <span class="badge" style="color:${t.text};border-color:${t.color};background:${t.bg}">${t.label}</span></div>
-      <div class="chart-sub">${m.id} · ${m.sector} · Limite: ${m.limit} ${m.unit}</div>
+      <div class="chart-title">${m.name}</div>
       <canvas id="curve-${m.id}" height="180"></canvas>
     `;
     grid.appendChild(box);
 
     const ctx = document.getElementById(`curve-${m.id}`).getContext('2d');
+
+    const realData = LABELS.map((_,i)=> i < m.base.length ? m.base[i] : null);
+
+    const projectionData = LABELS.map((_, i) => {
+  const lastIndex = m.base.length - 1;
+
+  if (i < lastIndex) return null;
+
+  if (i === lastIndex) return m.base[lastIndex];
+
+  if (i <= m.failIndex) {
+    const progress = (i - lastIndex) / (m.failIndex - lastIndex);
+    return m.base[lastIndex] + progress * (m.forecast - m.base[lastIndex]);
+  }
+
+  return null;
+});
+
     new Chart(ctx, {
       type: 'line',
       data: {
         labels: LABELS,
         datasets: [
-          { label:'Real', data:m.allVib.map((v,i)=>i<=IDX_CUTOFF?v:null), borderColor:t.color, backgroundColor:t.color+'15', borderWidth:2.5, fill:true, tension:.35 },
-          { label:'Projeção', data:m.allVib.map((v,i)=>i>=IDX_CUTOFF?v:null), borderColor:'#94a3b8', borderWidth:2, borderDash:[6,4], tension:.35 },
-          { label:'Limite', data:LABELS.map(()=>m.limit), borderColor:'#ef444444', borderWidth:1, borderDash:[3,3], pointRadius:0 }
+          {
+            label:'Real',
+            data: realData,
+            borderColor:t.color,
+            backgroundColor:t.color+'15',
+            borderWidth:2.5,
+            fill:true,
+            tension:.3
+          },
+          {
+            label:'Projeção',
+            data: projectionData,
+            borderColor:'#64748b',
+            borderWidth:2,
+            borderDash:[6,4],
+            pointRadius:(ctx)=> ctx.dataIndex === m.failIndex ? 6 : 0,
+            pointBackgroundColor:'#ef4444',
+            tension:0
+          },
+          {
+          label:'Aviso',
+          data: LABELS.map(()=> m.warning),
+          borderColor:'#f59e0b',
+          borderDash:[5,5],
+          pointRadius:0
+        },
+        {
+          label:'Manutenção',
+          data: LABELS.map(()=> m.limit),
+          borderColor:'#ef4444',
+          borderWidth:2,
+          pointRadius:0
+        }
         ]
       },
       options: {
-        plugins: { legend: { display: false }, annotation: { annotations: {
-          cutoff: { type:'line', scaleID:'x', value:"Jan/26", borderColor:'#f59e0b', borderWidth:2 },
-          buy: { type:'line', scaleID:'x', value:"Abr/26", borderColor:'#a855f7', borderWidth:2, borderDash:[5,5] },
-          maint: { type:'line', scaleID:'x', value:"Ago/26", borderColor:'#ef4444', borderWidth:2, borderDash:[5,5] }
-        }}},
-        scales: { y: { suggestedMax: m.limit * 1.2, ticks: { font: { size: 9 } } }, x: { ticks: { font: { size: 9 } } } }
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { suggestedMax: m.limit * 1.2 },
+          x: { ticks: { font: { size: 9 } } }
+        }
       }
     });
   });
